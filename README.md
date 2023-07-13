@@ -1,2 +1,1 @@
-# targoyle.github.io
-my GitHub Pages
+[targoyle.github.io](https://targoyle.github.io/)
