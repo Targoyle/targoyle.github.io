@@ -31,12 +31,12 @@ class EchoResponse(BaseModel):
 
 
 class LocationResponse(BaseModel):
-    ip: str
-    longitude: str
-    latitude: str
-    city: str
-    country: str
-    timezone: str
+    ip: str = "192.0.2.0"
+    latitude: str = "35.6768"
+    longitude: str = "139.7522"
+    city: str = "Tokyo"
+    country: str = "JP"
+    timezone: str = "Asia/Tokyo"
 
 
 @app.get(
@@ -84,16 +84,16 @@ def location(request: Request):
     headers = dict(request.headers)
 
     ip = headers.get("x-forwarded-for") or headers.get("x-vercel-proxied-for")
-    longitude = headers.get("x-vercel-ip-longitude")
     latitude = headers.get("x-vercel-ip-latitude")
+    longitude = headers.get("x-vercel-ip-longitude")
     city = headers.get("x-vercel-ip-city")
     country = headers.get("x-vercel-ip-country")
     timezone = headers.get("x-vercel-ip-timezone")
 
     return {
         "ip": ip,
-        "longitude": longitude,
         "latitude": latitude,
+        "longitude": longitude,
         "city": city,
         "country": country,
         "timezone": timezone,
