@@ -20,7 +20,7 @@ app.add_middleware(
 
 
 class HelloWorldResponse(BaseModel):
-    Hello: str
+    Hello: str = "World"
 
 
 class EchoResponse(BaseModel):
