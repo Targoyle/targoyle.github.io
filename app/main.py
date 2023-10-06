@@ -27,6 +27,15 @@ class EchoResponse(BaseModel):
     headers: Dict[str, str]
 
 
+class LocationResponse(BaseModel):
+    ip: str
+    longitude: str
+    latitude: str
+    city: str
+    country: str
+    timezone: str
+
+
 @app.get(
     "/",
     summary="Hello World Endpoint",
@@ -60,3 +69,29 @@ def echo(request: Request):
         headers.pop(header, None)
 
     return {"headers": headers}
+
+
+@app.get(
+    "/location",
+    summary="Get client location",
+    description="受信したHTTPヘッダーを基に、クライアントの位置情報を返却します。",
+    response_model=LocationResponse,
+)
+def location(request: Request):
+    headers = dict(request.headers)
+
+    ip = headers.get("x-forwarded-for") or headers.get("x-vercel-proxied-for")
+    longitude = headers.get("x-vercel-ip-longitude")
+    latitude = headers.get("x-vercel-ip-latitude")
+    city = headers.get("x-vercel-ip-city")
+    country = headers.get("x-vercel-ip-country")
+    timezone = headers.get("x-vercel-ip-timezone")
+
+    return {
+        "ip": ip,
+        "longitude": longitude,
+        "latitude": latitude,
+        "city": city,
+        "country": country,
+        "timezone": timezone,
+    }
