@@ -1,13 +1,21 @@
 from typing import Dict
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-
 
 app = FastAPI(
     openapi_url="/openapi.json",  # "/openapi.json" or None
     docs_url="/docs",  # "/docs" or None
     redoc_url="/redoc",  # "/redoc" or None
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -38,6 +46,4 @@ def hello_world():
     response_model=EchoResponse,
 )
 def echo(request: Request):
-    headers = dict(request.headers)
-    headers.pop("host", None)
     return {"headers": headers}
