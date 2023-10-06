@@ -46,4 +46,5 @@ def hello_world():
     response_model=EchoResponse,
 )
 def echo(request: Request):
+    headers = dict(request.headers)
     return {"headers": headers}
