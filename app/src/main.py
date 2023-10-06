@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from typing import Dict
 
-from routers import default
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
+
 
 app = FastAPI(
     openapi_url="/openapi.json",  # "/openapi.json" or None
@@ -8,15 +10,34 @@ app = FastAPI(
     redoc_url="/redoc",  # "/redoc" or None
 )
 
-app.include_router(default.router)
 
-'''
-from fastapi import FastAPI
-
-app = FastAPI()
+class HelloWorldResponse(BaseModel):
+    Hello: str
 
 
-@app.get("/")
-async def root():
-    return {"Hello": "World src"}
-'''
+class EchoResponse(BaseModel):
+    headers: Dict[str, str]
+
+
+@app.get(
+    "/",
+    summary="Hello World Endpoint",
+    description="このエンドポイントは、簡単な 'Hello, World!' メッセージを返却します。",
+    response_model=HelloWorldResponse,
+)
+def hello_world():
+    return {
+        "Hello": "World",
+    }
+
+
+@app.get(
+    "/echo",
+    summary="Echo Client Headers",
+    description="受信した HTTP ヘッダをクライアントに返却します。",
+    response_model=EchoResponse,
+)
+def echo(request: Request):
+    headers = dict(request.headers)
+    headers.pop("host", None)
+    return {"headers": headers}
