@@ -5,14 +5,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 app = FastAPI(
-    openapi_url="/openapi.json",  # "/openapi.json" or None
-    docs_url="/docs",  # "/docs" or None
-    redoc_url="/redoc",  # "/redoc" or None
+    openapi_url="/openapi.json",
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://targoyle.github.io"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -47,4 +47,15 @@ def hello_world():
 )
 def echo(request: Request):
     headers = dict(request.headers)
+
+    excluded_headers = [
+        "x-vercel-proxy-signature",
+        "x-vercel-proxy-signature-ts",
+        "x-vercel-id",
+        "x-vercel-deployment-url",
+    ]
+
+    for header in excluded_headers:
+        headers.pop(header, None)
+
     return {"headers": headers}
