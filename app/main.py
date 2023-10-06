@@ -97,6 +97,10 @@ def location(request: Request):
     }
 
 
+import sys
+
+sys.path.append(".")
+
 from testlib.main import get_message_from_testlib
 
 @app.get("/message-from-testlib")
