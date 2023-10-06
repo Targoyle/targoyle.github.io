@@ -53,6 +53,7 @@ def echo(request: Request):
         "x-vercel-proxy-signature-ts",
         "x-vercel-id",
         "x-vercel-deployment-url",
+        "forwarded",
     ]
 
     for header in excluded_headers:
