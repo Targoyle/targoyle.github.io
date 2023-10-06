@@ -13,7 +13,11 @@
         main {
             font-family: Futura, Helvetica, Verdana, sans-serif;
             font-size: large;
-            margin-left: 10%;
+            margin-left: 10vw;
+        }
+
+        p {
+            margin-left: 15vw;
         }
 
         .logo {
@@ -38,9 +42,36 @@
         <p>
             It works. ⁽⁽&#x1F335;₎₎
         </p>
+
+        <h2>
+            GeoIP Infomation
+        </h2>
+
+        <p id="ip"></p>
+        <p id="city"></p>
+        <p id="country"></p>
+        <p id="latitude"></p>
+        <p id="longitude"></p>
+        <p id="timezone"></p>
     </main>
 
     <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            fetch('https://targoyle-github-io.vercel.app/location')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('ip').innerText = `IP: ${data.ip}`;
+                    document.getElementById('city').innerText = `City: ${data.city}`;
+                    document.getElementById('country').innerText = `Country: ${data.country}`;
+                    document.getElementById('latitude').innerText = `Latitude: ${data.latitude}`;
+                    document.getElementById('longitude').innerText = `Longitude: ${data.longitude}`;
+                    document.getElementById('timezone').innerText = `Timezone: ${data.timezone}`;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
+
         console.log('https://targoyle.jp')
     </script>
 </body>
