@@ -95,3 +95,10 @@ def location(request: Request):
         "country": country,
         "timezone": timezone,
     }
+
+
+from testlib.main import get_message_from_testlib
+
+@app.get("/message-from-testlib")
+def message_from_testlib():
+    return {"message": get_message_from_testlib()}
