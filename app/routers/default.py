@@ -1,10 +1,8 @@
 import base64
-import os
-import sys
 from io import BytesIO
 from typing import Dict
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
