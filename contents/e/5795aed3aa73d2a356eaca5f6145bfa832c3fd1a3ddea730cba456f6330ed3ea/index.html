@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aquarium</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            background-color: steelblue;
+        }
+
+        .tank {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fish {
+            position: absolute;
+            font-size: 2em;
+            transition: all 0.5s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tank">
+        <div class="fish" id="fish1">🐟</div>
+        <div class="fish" id="fish2">🐠</div>
+        <div class="fish" id="fish3">🐡</div>
+    </div>
+
+    <script>
+        const moveFish = (fish) => {
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            fish.style.left = `${x}px`;
+            fish.style.top = `${y}px`;
+        }
+
+        const fishIDs = ['fish1', 'fish2', 'fish3'];
+
+        setInterval(() => {
+            const randomIndex = Math.floor(Math.random() * fishIDs.length);
+            const randomFishID = fishIDs[randomIndex];
+            moveFish(document.getElementById(randomFishID));
+        }, 1000);
+    </script>
+</body>
+
+</html>

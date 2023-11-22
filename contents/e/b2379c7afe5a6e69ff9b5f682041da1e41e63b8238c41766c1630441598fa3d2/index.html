@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallary - さぼてにずむ@出張所</title>
+    <meta name="description" content="たーごいるの個人サークル、「さぼてにずむ」の出張ギャラリー。">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f3f3f3;
+        }
+
+        h1 {
+            font-size: 20px;
+            display: grid;
+            align-items: center;
+            color: #0072BC;
+            text-align: center;
+            cursor: default;
+        }
+
+        h2 {
+            margin-top: 0px;
+            font-size: 16px;
+            align-items: center;
+            color: #0072BC;
+            text-align: center;
+        }
+
+        h1:not(.loaded) {
+            cursor: pointer;
+        }
+
+        h1.main-heading {
+            font-size: 30px;
+            display: grid;
+            align-items: center;
+            color: #515151;
+            text-align: center;
+            cursor: default;
+            margin-bottom: 0%;
+        }
+
+        h2.main-heading {
+            font-size: 25px;
+            display: grid;
+            align-items: center;
+            color: #515151;
+            text-align: center;
+            cursor: default;
+            margin-bottom: 0%;
+        }
+
+        p {
+            color: #515151;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .separator {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .artistInfo {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-gap: 20px;
+            width: 80%;
+            margin: auto;
+        }
+
+        .grid .imageContainer {
+            width: 100%;
+            height: 0;
+            padding-bottom: 100%;
+            position: relative;
+            background: #eee;
+        }
+
+        .grid .imageContainer img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .modal-content img {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .modal-content a {
+            background-color: #AAA;
+            padding: 10px;
+            display: inline-block;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #0072BC;
+            text-align: center;
+            width: 200px;
+        }
+
+        .prev,
+        .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-30%);
+            height: 200px;
+            width: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: -50px;
+            padding: 16px;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            transition: 0.6s ease;
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+        }
+
+        @media screen and (max-width: 600px) {
+
+            .prev,
+            .next {
+                height: 100px;
+                top: auto;
+                bottom: 10px;
+            }
+        }
+
+        .next {
+            right: 0;
+            border-radius: 3px 0 0 3px;
+        }
+
+        .prev:hover,
+        .next:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        footer {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        footer .p {
+            font-size: 12px;
+            text-align: center;
+        }
+
+        footer .logo {
+            margin-top: 20px;
+            width: 30vw;
+            max-width: 200px;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="main-heading">
+        いらすと・画像 ぎゃらりー
+    </h1>
+    <h2 class="main-heading">
+        Illust/Image Gallary
+    </h2>
+    <p>
+        <a href="https://nostr.build/">nostr.build media uploader</a> にアップロードした絵とかとか
+    </p>
+
+    <div class="grid" id="imageGrid"></div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content" id="modal-content"></div>
+        <span id="close"
+            style="color: #f1f1f1; font-size: 35px; position: absolute; top: 15px; right: 35px; transition: 0.3s; cursor: pointer;"
+            onclick="closeModal()">&times;</span>
+        <a class="prev" onclick="changeImage(event, -1)">&#10094;</a>
+        <a class="next" onclick="changeImage(event, 1)">&#10095;</a>
+    </div>
+
+    <script>
+        var baseImageUrl = "https://cdn.nostr.build/i/";
+        var images, currentImageIndex;
+        var loadedArtists = new Set();
+        var artistObjects = [
+            {
+                "images": [
+                    {
+                        "name": "8190ec7d20ab73e8fd6c61cef8fe0498e6138372f4b489fc613873e938c80dec.jpg",
+                        "date": "2023-08-24"
+                    },
+                    {
+                        "name": "313744efb491eb88f218157361f47f55a19de0491cdb0bed0831688f57e02dc6.png",
+                        "date": "2023-08-23"
+                    },
+                    {
+                        "name": "82e167464773a390950c2f7181623e44c8973434f564a24b4bc48d5a39d49b03.png",
+                        "date": "2023-08-23"
+                    },
+                    {
+                        "name": "809fa27ff738ef386b5de612bba85d41b2d94ecb176f1b693fc10df7f5142764.png",
+                        "date": "2023-08-23"
+                    },
+                    {
+                        "name": "46afc4e3ce80fc5e652118f090a7248945e08c7516919588b27e9acacb871e77.png",
+                        "date": "2023-08-23"
+                    },
+                    {
+                        "name": "8c80e17afc095130617973d145b432e762d8b0485d4841a4a1cb426b73d778b5.png",
+                        "date": "2023-08-22"
+                    },
+                    {
+                        "name": "23b777e9b4957c25eb3027c12913a3dda544f24461bcfd37f7a2a2211aac134c.png",
+                        "date": "2023-08-22"
+                    },
+                    {
+                        "name": "a78b2d7bb3ac46453d19ca38ff999d1cee60a0bc2462459a033d6bc57e5ef244.gif",
+                        "date": "2023-08-22"
+                    },
+                    {
+                        "name": "96e1b7867f7d314dba60dd17d602f61ee5dbd77b8ed819d7275ae8c08dd7ea38.png",
+                        "date": "2023-08-20"
+                    },
+                    {
+                        "name": "f4ae32214b295bb08a7c5010c24ba83d0c9178a1235e05e03d62fce03443e642.png",
+                        "date": "2023-08-20"
+                    },
+                    {
+                        "name": "00a1c5a03ad8ca5a02f1f7077efc270d0e36a7020d47d5f36474b6b50d7c553c.png",
+                        "date": "2023-08-20"
+                    },
+                    {
+                        "name": "6fc2f2a14faa217bee9ca94a4dd8789e064948cedec473beebb9002174010939.png",
+                        "date": "2023-08-20"
+                    },
+                    {
+                        "name": "b8725a1d06ceb65f9c381a5abac8e13a0c626beee9415aa8ee20ee430c595e32.png",
+                        "date": "2023-08-19"
+                    },
+                    {
+                        "name": "217a7fcb9ad558a5cba96714d8b89e316d489cb696523672dbd43d7fa4fa85d9.png",
+                        "date": "2023-08-19"
+                    },
+                    {
+                        "name": "e6a2421eab7d133e9d0e003762f88a54ea1ccb4b4562fcd2eec9867ee3f13125.png",
+                        "date": "2023-08-19"
+                    },
+                    {
+                        "name": "1e20bf08f097a9bbeea63f8a336bb2c103dd990b04aa2d6d61c8430e6f463409.png",
+                        "date": "2023-08-17"
+                    },
+                    {
+                        "name": "4bab88d03c74bb3142726f7f9236ad937c2d7a164c3a46360b813001673671dc.jpg",
+                        "date": "2023-08-17"
+                    },
+                    {
+                        "name": "e865268b44827e4c427605e947af04462488719c78df5e47e9d2d3b0d33002f2.jpg",
+                        "date": "2023-08-16"
+                    },
+                    {
+                        "name": "b41111b1d1f9d759c6042e801b3687ed3b7fd30609533e308ece605fc12a5a90.jpg",
+                        "date": "2023-08-15"
+                    },
+                    {
+                        "name": "74043fc8c1f882a26cf5c7786c1fa404d6a605b52f8102c1d33053e02d6ba10f.jpg",
+                        "date": "2023-08-14"
+                    },
+                    {
+                        "name": "35fce241437d4536d5af37c461321932d346fe74846840300fe83d0cc2f8bb6c.jpg",
+                        "date": "2023-08-13"
+                    },
+                    {
+                        "name": "1a5e3331c15c540267c7afac51f4859a3c9c6582178eee335be79ee4834721dd.jpg",
+                        "date": "2023-08-13"
+                    },
+                    {
+                        "name": "fafcec579c1679fa4fd0b2d36896da0d1a524db12db5e7dd0014bc3a68bd6064.jpg",
+                        "date": "2023-08-11"
+                    },
+                    {
+                        "name": "82f85ba0e7546a365346c72542c81eec2f931fc4ef7b2674266bfc41af92c258.png",
+                        "date": "2023-08-10"
+                    },
+                    {
+                        "name": "66a1adcb0972af744e2dc2764ef1fd2dff2409d0f8435de43e2ae2e07be44e81.png",
+                        "date": "2023-08-08"
+                    },
+                    {
+                        "name": "9a6196504ff9cdd67b0d7a373fb84a38e162087c9f5540c8f5eb199d7fef032e.png",
+                        "date": "2023-08-07"
+                    },
+                    {
+                        "name": "97c61fcf1118914145db88978c85b417ac2d848f94f5d141dfca37d212dd5576.png",
+                        "date": "2023-08-07"
+                    },
+                    {
+                        "name": "0fbbd359910c6eea22605741835bf1df2eba265dafc0468a587956579b7e573d.png",
+                        "date": "2023-08-06"
+                    },
+                    {
+                        "name": "2b2a74e243c391ce0c71aeed943a864b43ec6b23771758b237426f55baf77658.png",
+                        "date": "2023-08-06"
+                    },
+                    {
+                        "name": "97cce7198c2c74e6d4d2365a0441511d6b3b5fa4e9e0ddd41b8f00d26a2e37d4.png",
+                        "date": "2023-08-06"
+                    },
+                    {
+                        "name": "d0471e1bad00de6cd3fdc85423cf3b00d3f774e078e9b271025f0bd5f167c8bd.png",
+                        "date": "2023-08-06"
+                    },
+                    {
+                        "name": "bd53f9adddb781313cd3db4a375157a20c07211b57914df94a3c21aeff52a16f.png",
+                        "date": "2023-08-05"
+                    },
+                    {
+                        "name": "73010f10f5b0c36ca81841d0c530d1e2a9061de2ec0cb62f9349ae6d516ccd9f.png",
+                        "date": "2023-08-03"
+                    },
+                    {
+                        "name": "9332206f980cc3a5c0c9c023788de6c2ad52c673d09194b396409d546dbc8d61.png",
+                        "date": "2023-08-03"
+                    },
+                    {
+                        "name": "f9c57fe6b96637878f99a7b6dbc895772cc04c8a1335da29354eb2c5a9837b95.png",
+                        "date": "2023-08-03"
+                    },
+                    {
+                        "name": "2c1f54a6ca7d120cbf6dae50b71573a6684cd7af2e5c93982e415e22895b2489.png",
+                        "date": "2023-08-03"
+                    },
+                    {
+                        "name": "0aa29417c8ae10a55e761ccfdd10b36a5c1841d6b53ed18bab7aa82d7747bde8.png",
+                        "date": "2023-08-02"
+                    },
+                    {
+                        "name": "2a394230a4525e70f3a5c380e1c73c4d14a8d9e4019a3192a443833ae78bc3d3.png",
+                        "date": "2023-08-02"
+                    },
+                    {
+                        "name": "2eea3f76b49a15c7b0a5142f73e1d113a7c607f21d09af8a4a831fb8b38ba76e.png",
+                        "date": "2023-08-01"
+                    },
+                    {
+                        "name": "60caae6555348ececaf8456e4bc57337b2cd0578819461e5b13320422a8db611.png",
+                        "date": "2023-07-31"
+                    },
+                    {
+                        "name": "50b26b1a0c8a510f430f09dc085f4dc4be9a70ed3f4209a5b2a61fe5e8430a4f.png",
+                        "date": "2023-07-30"
+                    },
+                    {
+                        "name": "cf07d005f2cc1f3cb62bd1e46564767280f206d3a025b0f3242a744bf76578fe.png",
+                        "date": "2023-07-30"
+                    },
+                    {
+                        "name": "bbfbec92e69b95a87495f6cf714b6c35ba84e071070ce710d2989ffb722962d8.png",
+                        "date": "2023-07-27"
+                    },
+                    {
+                        "name": "22f4b79222ef8b2600a7d5c8656eec8cc3ef3c8b8af42c8d5ea53e3da6b217b8.png",
+                        "date": "2023-07-27"
+                    },
+                    {
+                        "name": "630300ea1e3bf41bd0b05b1f0c13de2194110135a2c017c53ccc4f02b818b402.png",
+                        "date": "2023-07-27"
+                    },
+                    {
+                        "name": "abca979439537ba34daf9692b961da393a8286132d6c2bda51e2bdf9dbdecae0.png",
+                        "date": "2023-07-27"
+                    },
+                    {
+                        "name": "d609ac482702555894bb10b6177f1d7ae041fc986cf111642ea88292efc4bbf3.png",
+                        "date": "2023-07-27"
+                    },
+                    {
+                        "name": "4dd6d407a276d05404cc53d8e159116da28b95dedd1abdd4a754b00e5b9fa466.png",
+                        "date": "2023-07-27"
+                    },
+                    {
+                        "name": "303ca3101f1aacb8dc73bc246b034af4110a4d8c86264a7a6ffb277052d290c9.png",
+                        "date": "2023-07-27"
+                    },
+                    {
+                        "name": "6a2868ebb53da2c295e3a2a20a29fa009f230f721b71e88c7ffc3ec8eaae870f.png",
+                        "date": "2023-07-27"
+                    },
+                    {
+                        "name": "48d96a73ee21e0ee51cf1254c5cb0eefc6d3d93149b19aedeb0fd4386cd411d6.png",
+                        "date": "2023-07-18"
+                    }
+                ],
+                "artist": {
+                    "name": "たーごいる\n@Targoyle",
+                    "links": [
+                        {
+                            "name": "targoyle.jp",
+                            "link": "https://targoyle.jp"
+                        },
+                        {
+                            "name": "Nostr (Rabbit)",
+                            "link": "https://syusui-s.github.io/rabbit/npub1targ0yle577hpqnumt2u2em78eve07jn6zfq42kyuvp2cr2garnseahjvn"
+                        }
+                    ]
+                }
+            }
+        ];
+
+        window.onload = function () {
+            var imageGrid = document.getElementById("imageGrid");
+
+            let lastArtist = "";
+
+            const colors = ["#FBDAC8", "#FADBDA", "#FADCE9", "#E7D5E8", "#D2CCE6", "#D3DEF1",
+                "#D3EDFB", "#D4ECEA", "#D5EAD8", "#ECF4D9", "#FFFCDB", "#FEECD2"];
+
+            images = [];
+            artistObjects.forEach(function (artistObj, artistIndex) {
+                const currentArtist = artistObj.artist.name;
+                if (currentArtist !== lastArtist) {
+                    lastArtist = currentArtist;
+                    const separator = document.createElement("div");
+                    separator.className = "separator";
+                    separator.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+                    const artistInfo = document.createElement("div");
+                    artistInfo.className = "artistInfo";
+
+                    const artistName = document.createElement("h1");
+                    artistName.textContent = lastArtist;
+                    artistInfo.appendChild(artistName);
+
+                    artistObj.artist.links.forEach(function (linkObj) {
+                        var linkElement = document.createElement("h2");
+                        var aElement = document.createElement("a");
+                        aElement.href = linkObj.link;
+                        aElement.textContent = linkObj.name;
+                        linkElement.appendChild(aElement);
+                        artistInfo.appendChild(linkElement);
+                    });
+
+                    separator.appendChild(artistInfo);
+                    imageGrid.appendChild(separator);
+
+                    loadImagesForArtist(separator, lastArtist);
+                    loadedArtists.add(lastArtist);
+                }
+
+                artistObj.images.slice().reverse().forEach(function (imageObj, index) {
+                    images.push({
+                        image: imageObj,
+                        index: images.length,
+                        artist: artistObj,
+                        artistIndex: artistIndex,
+                        imageIndex: index
+                    });
+                });
+            });
+
+            var modal = document.getElementById("modal");
+            var modalContent = document.getElementById("modal-content");
+            modalContent.onclick = function (event) {
+                if (event.target == modalContent) {
+                    modal.style.display = "none";
+                }
+            };
+        }
+
+
+        function loadImagesForArtist(separatorElement, artistName) {
+            const artistObj = artistObjects.find(artistObj => artistObj.artist.name === artistName);
+
+            artistObj.images.slice().reverse().forEach(function (imageObj, index) {
+                var imageContainer = document.createElement("div");
+                imageContainer.className = "imageContainer";
+
+                var imgElement = document.createElement("img");
+                imgElement.src = baseImageUrl + imageObj.name;
+                imgElement.title = imageObj.date;
+                imgElement.loading = "lazy";
+                imgElement.onclick = function () {
+                    openModal(event);
+                }
+
+                imageContainer.appendChild(imgElement);
+                imageGrid.insertBefore(imageContainer, separatorElement.nextSibling);
+            });
+
+            separatorElement.firstChild.firstChild.classList.add('loaded');
+            separatorElement.firstChild.firstChild.style.color = '#515151';
+        }
+
+        function openModal(event) {
+            const clickedImageUrl = event.target.src;
+
+            images = [];
+            artistObjects.forEach(artist => {
+                artist.images.forEach((image, index) => {
+                    images.push({
+                        image: image,
+                        index: images.length,
+                        artist: artist,
+                    });
+                });
+            });
+
+            const currentImageObj = images.find(imageObj => baseImageUrl + imageObj.image.name === clickedImageUrl);
+            currentImage = currentImageObj.image;
+            currentImageIndex = currentImageObj.index;
+
+            setModalImage();
+
+            var modal = document.getElementById("modal");
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            var modal = document.getElementById("modal");
+            modal.style.display = "none";
+        }
+
+        function changeImage(event, direction) {
+            event.stopPropagation();
+            currentImageIndex = (currentImageIndex + direction + images.length) % images.length;
+            currentImage = images[currentImageIndex].image;
+            setModalImage();
+        }
+
+        function setModalImage() {
+            var modalContent = document.getElementById("modal-content");
+            while (modalContent.firstChild) {
+                modalContent.removeChild(modalContent.firstChild);
+            }
+
+            var modalImg = document.createElement("img");
+            modalImg.src = baseImageUrl + currentImage.name;
+            modalContent.appendChild(modalImg);
+
+            if (currentImage.link && currentImage.link_to) {
+                var modalLink = document.createElement("a");
+                modalLink.href = currentImage.link;
+                modalLink.textContent = currentImage.link_to;
+                modalLink.style.display = 'block';
+                modalContent.appendChild(modalLink);
+            }
+        }
+    </script>
+
+    <footer>
+        <a href="https://targoyle.jp"><img class="logo" src="https://cdn.targoyle.jp/img/sabotenism.png"
+                alt="circle_logo"></a>
+        <p>
+            (C) 2023 Targoyle
+        </p>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>オセロゲーム</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            grid-template-rows: repeat(8, 50px);
+            gap: 2px;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: green;
+        }
+
+        .cell:hover {
+            opacity: 0.8;
+        }
+
+        .disc {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+    </style>
+</head>
+
+<body>
+    <h1>オセロゲーム</h1>
+    <div id="board"></div>
+    <script>
+        const board = document.getElementById("board");
+
+        // オセロの盤面を作成
+        for (let i = 0; i < 64; i++) {
+            const cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.addEventListener("click", () => handleClick(i));
+            board.appendChild(cell);
+        }
+
+        let state = Array(64).fill(null);
+        const initialCells = [27, 28, 35, 36];
+        initialCells.forEach(cell => {
+            state[cell] = cell === 27 || cell === 36 ? "white" : "black";
+            renderDisc(cell, state[cell]);
+        });
+
+        let currentPlayer = "black";
+
+        function handleClick(index) {
+            if (state[index] !== null || !isValidMove(index, currentPlayer)) {
+                return;
+            }
+
+            state[index] = currentPlayer;
+            renderDisc(index, currentPlayer);
+
+            const cellsToFlip = getCellsToFlip(index, currentPlayer);
+            cellsToFlip.forEach(cell => {
+                state[cell] = currentPlayer;
+                board.children[cell].firstChild.classList.remove("white", "black");
+                board.children[cell].firstChild.classList.add(currentPlayer);
+            });
+
+            currentPlayer = currentPlayer === "black" ? "white" : "black";
+        }
+
+        function isValidMove(index, player) {
+            return getCellsToFlip(index, player).length > 0;
+        }
+
+        function getCellsToFlip(index, player) {
+            const opponent = player === "black" ? "white" : "black";
+            const directions = [
+                [-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, 1], [-1, 1], [1, -1]
+            ];
+
+            let cellsToFlip = [];
+
+            directions.forEach(([dx, dy]) => {
+                const lineToFlip = [];
+                let x = index % 8 + dx;
+                let y = Math.floor(index / 8) + dy;
+
+                while (x >= 0 && x < 8 && y >= 0 && y < 8) {
+                    const newIndex = y * 8 + x;
+
+                    if (state[newIndex] === null) {
+                        break;
+                    } else if (state[newIndex] === opponent) {
+                        lineToFlip.push(newIndex);
+                    } else {
+                        cellsToFlip = cellsToFlip.concat(lineToFlip);
+                        break;
+                    }
+
+                    x += dx;
+                    y += dy;
+                }
+            });
+
+            return cellsToFlip;
+        }
+
+        function renderDisc(index, color) {
+            const disc = document.createElement("div");
+            disc.classList.add("disc", color);
+            board.children[index].appendChild(disc);
+        }
+
+        function startGame() {
+            const board = document.getElementById("board");
+
+            // オセロの盤面を作成
+            for (let i = 0; i < 64; i++) {
+                const cell = document.createElement("div");
+                cell.classList.add("cell");
+                cell.addEventListener("click", () => handleClick(i));
+                board.appendChild(cell);
+            }
+
+            initializeBoard();
+            currentPlayer = "black";
+        }
+
+        function initializeBoard() {
+            state = Array(64).fill(null);
+            const initialCells = [27, 28, 35, 36];
+            initialCells.forEach(cell => {
+                state[cell] = cell === 27 || cell === 36 ? "white" : "black";
+                renderDisc(cell, state[cell]);
+            });
+        }
+
+        startGame();
+
+    </script>
+</body>
+
+</html>

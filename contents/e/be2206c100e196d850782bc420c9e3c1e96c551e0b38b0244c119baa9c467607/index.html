@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web-based XEyes</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+
+        .eye-container {
+            display: flex;
+            justify-content: space-between;
+            width: 200px;
+        }
+
+        .eye {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            background-color: white;
+            border-radius: 50%;
+            border: 2px solid #333;
+        }
+
+        .pupil {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #333;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="eye-container">
+        <div class="eye">
+            <div class="pupil"></div>
+        </div>
+        <div class="eye">
+            <div class="pupil"></div>
+        </div>
+    </div>
+    <script>
+        const eyes = document.querySelectorAll('.eye');
+
+        document.addEventListener('mousemove', (event) => {
+            eyes.forEach((eye) => {
+                const eyeRect = eye.getBoundingClientRect();
+                const eyeCenterX = eyeRect.left + eyeRect.width / 2;
+                const eyeCenterY = eyeRect.top + eyeRect.height / 2;
+
+                const mouseX = event.clientX;
+                const mouseY = event.clientY;
+
+                const dx = mouseX - eyeCenterX;
+                const dy = mouseY - eyeCenterY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                const maxRadius = eye.clientWidth / 2 - 15;
+                const radius = Math.min(distance, maxRadius);
+                const angle = Math.atan2(dy, dx);
+
+                const pupil = eye.querySelector('.pupil');
+                const offsetX = Math.cos(angle) * radius;
+                const offsetY = Math.sin(angle) * radius;
+
+                pupil.style.transform = `translate(-50%, -50%) translate(${offsetX}px, ${offsetY}px)`;
+            });
+        });
+
+    </script>
+</body>
+
+</html>
