@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon URL 省略ツール v0.1.1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            font-size: larger;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: larger;
+        }
+
+        a {
+            font-size: small;
+        }
+
+        .container {
+            max-width: 40rem;
+            margin: 0 auto;
+            padding: 0.0rem;
+            display: grid;
+            grid-template-columns: 1fr 2fr auto;
+            grid-gap: 0.5rem;
+            align-items: center;
+        }
+
+        .input-group label,
+        .result label {
+            justify-self: end;
+            margin-right: 0.0rem;
+            width: 8rem;
+        }
+
+        .input-group input,
+        .result input {
+            justify-self: stretch;
+        }
+
+        .input-group button,
+        .result button {
+            justify-self: start;
+            margin-left: 0.0rem;
+            width: 7rem;
+        }
+
+        .input-group,
+        .result {
+            display: contents;
+        }
+
+        .disabled-link {
+            color: #ccc;
+            text-decoration: none;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Amazon URL 省略ツール</h1>
+
+    <div class="container">
+        <div class="input-group">
+            <label for="amazonUrl">Amazon URL:</label>
+            <input type="text" id="amazonUrl" oninput="shortenUrl()" />
+            <button onclick="shortenUrl()">実行</button>
+        </div>
+        <div class="result">
+            <label for="shortUrl">省略後 URL:</label>
+            <input type="text" id="shortUrl" readonly />
+            <button onclick="copyToClipboard()">コピー</button>
+        </div>
+        <div id="linkContainer" class="result">
+            <label for="shortUrlLink">確認用リンク:</label>
+            <a id="shortUrlLink" href="#" onclick="return false;" class="hidden"></a>
+        </div>
+    </div>
+
+    <script>
+        function shortenUrl() {
+            const amazonUrl = document.getElementById('amazonUrl').value;
+            const match = amazonUrl.match(/\/dp\/(\w+)/);
+            const linkElement = document.getElementById('shortUrlLink');
+            if (match && match[1]) {
+                const shortUrl = `https://www.amazon.co.jp/dp/${match[1]}`;
+                document.getElementById('shortUrl').value = shortUrl;
+                linkElement.href = shortUrl;
+                linkElement.textContent = shortUrl;
+                linkElement.className = '';
+                linkElement.onclick = null;
+            } else {
+                document.getElementById('shortUrl').value = '無効なURLです';
+                linkElement.href = '#';
+                linkElement.textContent = 'リンクなし';
+                linkElement.className = 'hidden';
+                linkElement.onclick = function () { return false; };
+            }
+        }
+        function copyToClipboard() {
+            const shortUrl = document.getElementById('shortUrl');
+            shortUrl.select();
+            document.execCommand('copy');
+        }
+    </script>
+</body>
+
+</html>
