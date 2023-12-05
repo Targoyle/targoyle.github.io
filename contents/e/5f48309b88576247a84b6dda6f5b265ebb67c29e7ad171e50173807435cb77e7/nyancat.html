@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        #nyan-cat {
+            position: absolute;
+            top: 50%;
+            width: 50px;
+            height: 30px;
+            background: pink;
+            animation: nyan-cat-animation 5s linear infinite;
+        }
+
+        @keyframes nyan-cat-animation {
+            0% {
+                left: -50px;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nyan-cat"></div>
+
+    <script>
+        var nyanCat = document.getElementById('nyan-cat');
+        setInterval(function () {
+            var randomColor = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
+            nyanCat.style.backgroundColor = randomColor;
+        }, 100);
+    </script>
+</body>
+
+</html>
