@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>hostr でつくる単発 HTML - Nostr (2) Advent Calendar 2023/12/5</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.4.0/github-markdown.min.css" rel="stylesheet">
+<link href="prism.min.css" rel="stylesheet">
+<style>
+body {
+padding-top: 3.5rem;
+padding-right: 15%;
+padding-left: 15%;
+padding-bottom: 3.5rem;
+}
+@media (max-width: 600px) {
+body {
+padding-right: 5%;
+padding-left: 5%;
+}
+}
+footer {
+text-align: center;
+}
+footer .logo {
+width: 30vw;
+height: auto;
+max-width: 200px;
+}
+</style>
+</head>
+<body class="markdown-body">
+<img src="https://cdn.targoyle.jp/img/230723_1500x500.webp">
+<main>
+<div style="text-align: right;"> 
+    23.12.05<br>
+    Targoyle
+</div>
+
+<h1>hostr でつくる単発 HTML</h1>
+<p>&emsp;たーごいるです。<a href="https://adventar.org/calendars/8880">Nostr アドカレ第二会場</a> の 5日目です。普段はソフト系とは全く関係ないことをしているなんでも屋さんです。
+プログラミングだと Python を大体 7 年くらいやってます。</p>
+<p>&emsp;Web は全然なんですが、数カ月前に GPT-4 が登場し、壁打ちやプログラミングの問題解決においての強力なパートナーになりました。
+GPT を調べるなかで、いろいろなプログラムを書かせたりしていたんですが、HTML/CSS/JS も書けるのでいくつか試して検証していました。
+そんななか <a href="https://nostter.app/studiokaiji.com">Kaiji</a> さんが hostr ... <a href="https://github.com/studiokaiji/nostr-webhost">Nostr Webhost</a> をリリースしました。</p>
+<p>&emsp;単発ネタの HTML をポンポン投げるのにちょうどいいんじゃね？ と思ってやってみたら結構いい感じでした……そんな感じの記事です。</p>
+<p>Nostr よりは GPT 比率激重です。</p>
+<h2>nostr-webhost のインストール</h2>
+<p>&emsp;...は省きます。<a href="https://github.com/studiokaiji/nostr-webhost/blob/main/readme.md">README.md</a> を読もう！！！</p>
+<h2>自分のディレクトリ構成</h2>
+<p>&emsp;以下のようになっています。この記事も markdown で書かれています。
+markdown を書き終わったら、conv.py を実行して HTML に変換しつつヘッダーとフッターをくっつけます。
+prism はコードハイライト用のライブラリです。</p>
+<pre><code class="language-bash">nostrh$ tree .
+.
+├── archive
+│   ├── &lt;生成された hex ID&gt;
+│   │    └── index.html
+│    ...
+│
+├── dist
+│   ├── calc.html
+│   ├── index.html
+│   ├── nyancat.html
+│   ├── prism.min.css
+│   └── prism.min.js
+├── markdown
+│   └── index.md
+├── memo.md
+├── resources
+│   ├── prism.min.css
+│   └── prism.min.js
+└── utils
+    ├── conv.py
+    ├── note.md
+    ├── prism.md
+    └── test.py
+</code></pre>
+<p><code>conv.py</code> はこんな感じ</p>
+<pre><code class="language-python">import os
+import readline
+import shutil
+
+import markdown
+
+# ---
+
+RESOURCE_DIR = &quot;../resources&quot;
+
+MARKDOWN_DIR = &quot;../markdown&quot;
+EXCLUDE_MD_DIR = &quot;_archive&quot;
+
+DIST_DIR = &quot;../dist&quot;
+
+# ---
+
+lang = &quot;ja&quot;  # en
+
+prism_choice = input(&quot;Use prism.js? [y/N] &gt; &quot;).strip().lower() or &quot;n&quot;
+use_prismjs = prism_choice != &quot;n&quot;
+
+title = input(&quot;Page title &gt; &quot;)
+
+if use_prismjs:
+    shutil.copy(os.path.join(RESOURCE_DIR, &quot;prism.min.css&quot;), DIST_DIR)
+    shutil.copy(os.path.join(RESOURCE_DIR, &quot;prism.min.js&quot;), DIST_DIR)
+
+style = &quot;&quot;&quot;body {
+padding-top: 3.5rem;
+padding-right: 15%;
+padding-left: 15%;
+padding-bottom: 3.5rem;
+}
+@media (max-width: 600px) {
+body {
+padding-right: 5%;
+padding-left: 5%;
+}
+}&quot;&quot;&quot;
+
+head = f&quot;&quot;&quot;&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;{lang}&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;title&gt;{title}&lt;/title&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1.0&quot;&gt;
+&lt;link href=&quot;https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;link href=&quot;https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.4.0/github-markdown.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+{'&lt;link href=&quot;prism.min.css&quot; rel=&quot;stylesheet&quot;&gt;' if use_prismjs else ''}
+&lt;style&gt;
+{style}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body class=&quot;markdown-body&quot;&gt;
+&lt;main&gt;
+&quot;&quot;&quot;
+
+script = f&quot;&quot;&quot;
+&lt;/main&gt;
+{'&lt;script src=&quot;prism.min.js&quot;&gt;&lt;/script&gt;' if use_prismjs else ''}
+&lt;/body&gt;
+&lt;/html&gt;
+&quot;&quot;&quot;
+
+extensions = [&quot;attr_list&quot;, &quot;fenced_code&quot;]
+
+input_files = []
+for path, directories, files in os.walk(MARKDOWN_DIR):
+    if EXCLUDE_MD_DIR in directories:
+        directories.remove(EXCLUDE_MD_DIR)
+
+    for file in files:
+        if file.endswith(&quot;.md&quot;):
+            input_files.append(os.path.join(path, file))
+
+md = markdown.Markdown(extensions=extensions)
+for input_file in input_files:
+    target_filename = input_file.replace(MARKDOWN_DIR, DIST_DIR).replace(&quot;.md&quot;, &quot;.html&quot;)
+    with open(input_file, &quot;r&quot;) as f:
+        text = md.convert(f.read())
+
+    p = &quot;&quot;
+    for j in range(target_filename.count(&quot;/&quot;) - 1):
+        p += &quot;../&quot;
+
+    html = head + text + script
+
+    target_directory = os.path.dirname(target_filename)
+    print(&quot;target dir:&quot;, target_directory)
+
+    os.makedirs(target_directory, exist_ok=True)
+    print(input_file, target_filename, sep=&quot; -&gt; &quot;)
+
+    with open(target_filename, &quot;w&quot;) as f:
+        f.write(html)
+</code></pre>
+<h2>GPT に書いてもらう</h2>
+<p>&emsp;さて、GPT に HTML を書いてもらう上で、いくつかこなしたあとにテンプレの必要性が見えてきました。
+これがあると残りの隙間を埋めるだけ……なタスクになるので、GPT 的にも処理しやすく、また一定のクオリティが確保できます。
+見た目上は。</p>
+<p><code>template.html</code></p>
+<pre><code class="language-HTML">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ja&quot;&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;Title&lt;/title&gt;
+    &lt;style&gt;
+        body {
+        }
+
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div class=&quot;&quot;&gt;
+
+    &lt;/div&gt;
+
+    &lt;script&gt;
+
+    &lt;/script&gt;
+&lt;/body&gt;
+
+&lt;/html&gt;
+</code></pre>
+<p>&emsp;このテンプレを GPT に投げて、あとは適当な指示を出すだけです。
+さっそく作ってみましょう......</p>
+<p>実際の会話リンク:</p>
+<ul>
+<li><a href="https://chat.openai.com/share/9b46ae46-270d-4100-8646-dea76a1e37fd">https://chat.openai.com/share/9b46ae46-270d-4100-8646-dea76a1e37fd</a></li>
+</ul>
+<p>成果物:</p>
+<ul>
+<li><a href="https://h.hostr.cc/e/58e748b7a9e92c362e5418aca1312a92596749a3e22b969a1c31467961884afc">Simple Calculator</a>
+  （<a href="https://targoyle.github.io/e/58e748b7a9e92c362e5418aca1312a92596749a3e22b969a1c31467961884afc/">予備リンク</a>）</li>
+</ul>
+<p>&emsp;あとは出来上がった HTML を適当なフォルダ内に <code>index.html</code> にして置いて、 <code>nostrh deploy .</code> すれば終わりです。<br>手軽！ ｽﾊﾞﾗｼｲ......</p>
+<h2>もうこいつでいいだろ</h2>
+<p>&emsp;というのもあるんですが、グラフィカルなものはやはり苦手なようです。先ほどの電卓はより細かく指定していけば、いつかはそれらしいアプリになるでしょう。
+逆に、グラフィックメインなウェブページでは致命的です。</p>
+<p>Nyancat を作ってと指定し、何回かやり直したり指摘したうえでできたページが以下です。</p>
+<ul>
+<li><a href="https://h.hostr.cc/e/0c909e953763283846d7ab0c5c0a7539c7ec9cdb673f146e7caaf233592fcc78">GPT が考える Nyancat</a>
+  （<a href="https://targoyle.github.io/e/0c909e953763283846d7ab0c5c0a7539c7ec9cdb673f146e7caaf233592fcc78/">予備リンク</a>）</li>
+</ul>
+<p>参考の本家 ( 音が出るかも ) :</p>
+<ul>
+<li><a href="https://www.nyan.cat/">NYAN.CAT!</a></li>
+</ul>
+<h2>もう少し役に立つやつ作ろうぜ</h2>
+<p>&emsp;以下は少しは使えるかなっていうページです。</p>
+<ul>
+<li>
+<p><a href="https://h.hostr.cc/e/b2379c7afe5a6e69ff9b5f682041da1e41e63b8238c41766c1630441598fa3d2">ギャラリー ( nostr.build )</a>
+  （<a href="https://targoyle.github.io/e/b2379c7afe5a6e69ff9b5f682041da1e41e63b8238c41766c1630441598fa3d2/">予備リンク</a>）</p>
+</li>
+<li>
+<p><a href="https://h.hostr.cc/e/4f4ba38459e934a4f5bdf103b59a2f7c04c051af1095e2046af4c8dcd813b43f">Amazon URL 省略ツール v0.1.1</a>
+  （<a href="https://targoyle.github.io/e/4f4ba38459e934a4f5bdf103b59a2f7c04c051af1095e2046af4c8dcd813b43f/">予備リンク</a>）</p>
+</li>
+<li>
+<p><a href="https://h.hostr.cc/e/a0304635715cff927d3a8d05e7572c173a236b4ab62d280b346b61df72a1ec2b">衝突シミュレーション</a>
+  （<a href="https://targoyle.github.io/e/a0304635715cff927d3a8d05e7572c173a236b4ab62d280b346b61df72a1ec2b/">予備リンク</a>）</p>
+</li>
+</ul>
+<p>...... 衝突シミュレーションは、一定比率の質量が大きく異なる物体をぶつけると、衝突回数が π に近似するというものです。</p>
+<h3>ゲーム</h3>
+<ul>
+<li><a href="https://h.hostr.cc/e/d7559a65d480726dcd9187998200fd225de137ce74df266aba177178c1e71d5e">ブロック崩し</a>
+  （<a href="https://targoyle.github.io/e/d7559a65d480726dcd9187998200fd225de137ce74df266aba177178c1e71d5e/">予備リンク</a>）</li>
+</ul>
+<h3>本当の単発ネタ</h3>
+<ul>
+<li><a href="https://h.hostr.cc/e/be2206c100e196d850782bc420c9e3c1e96c551e0b38b0244c119baa9c467607">Xeyes 風</a>
+  （<a href="https://targoyle.github.io/e/be2206c100e196d850782bc420c9e3c1e96c551e0b38b0244c119baa9c467607/">予備リンク</a>）</li>
+</ul>
+<p>...... 参考 : <a href="https://ja.wikipedia.org/wiki/Xeyes">Xeyes - Wikipedia</a></p>
+<ul>
+<li>
+<p><a href="https://h.hostr.cc/e/5795aed3aa73d2a356eaca5f6145bfa832c3fd1a3ddea730cba456f6330ed3ea">水槽</a>
+  （<a href="https://targoyle.github.io/e/5795aed3aa73d2a356eaca5f6145bfa832c3fd1a3ddea730cba456f6330ed3ea/">予備リンク</a>）</p>
+</li>
+<li>
+<p><a href="https://h.hostr.cc/e/3908d9e9ed31e9997af3d14bc063f6a123c24d58ed3ae301c3609aec3cc307d7">絵文字シティ</a>
+  （<a href="https://targoyle.github.io/e/3908d9e9ed31e9997af3d14bc063f6a123c24d58ed3ae301c3609aec3cc307d7/">予備リンク</a>）</p>
+</li>
+</ul>
+<h2>結構いろいろ作ったな……</h2>
+<p>&emsp;どうにも Web 系は移り変わりが早く、フレームワークをどれを使えば……！みたいなところで止まっていたんですが、
+CSS / Javascript でも色々作れるんだなぁということがわかった１年でした。</p>
+<p>&emsp;明日の第二会場アドカレ担当は <code>[ここに名前を入力]</code> さんです。</p>
+<p>&emsp;今日も Don't Trust. な精神で生きていきたい。</p>
+<h1>リンク</h1>
+<ul>
+<li><a href="https://adventar.org/calendars/8794">Nostr (1) Advent Calendar 2023</a></li>
+</ul>
+<p>&emsp;第二会場↓↓↓↓↓</p>
+<ul>
+<li><a href="https://adventar.org/calendars/8880">Nostr (2) Advent Calendar 2023</a></li>
+</ul>
+<p>↓↓↓↓↓ ぜひ自分のサイトにも遊びに来てね！ ↓↓↓↓↓</p>
+<ul>
+<li>
+<p><a href="https://targoyle.jp">targoyle.jp</a></p>
+<ul>
+<li>
+<p><a href="https://targoyle.jp/fanart/">#ごいるあーと ギャラリー</a></p>
+</li>
+<li>
+<p><a href="https://targoyle.jp/timeline">@Targoyle TweetGen</a></p>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://targoyle.github.io/">targoyle.github.io</a></p>
+<ul>
+<li><a href="https://targoyle.github.io/e/">hostr にあげたもの</a><br>
+  こちらは github pages に上げてあるものです。内容は同じ。</li>
+</ul>
+</li>
+<li>
+<p>Nostr リンク</p>
+<ul>
+<li><a href="https://nostter.app/targoyle.jp">@Targoyle</a></li>
+</ul>
+</li>
+</ul>
+<footer>
+<a href="https://targoyle.jp"><img class="logo" src="https://cdn.targoyle.jp/img/sabotenism.webp" alt="circle_logo" width="467" height="83"></a>
+<p>(C) 2023 Targoyle</p>
+</footer>
+</main>
+<script src="prism.min.js"></script>
+</body>
+</html>
