@@ -82,12 +82,11 @@ def location(request: Request):
     ip = headers.get("x-forwarded-for") or headers.get("x-vercel-proxied-for")
     latitude = headers.get("x-vercel-ip-latitude")
     longitude = headers.get("x-vercel-ip-longitude")
+    city = headers.get("x-vercel-ip-city")
     country = headers.get("x-vercel-ip-country")
     timezone = headers.get("x-vercel-ip-timezone")
 
-    try:
-        city = headers.get("x-vercel-ip-city")
-    except Exception as e:
+    if not city:
         city = "-"
 
     return {
