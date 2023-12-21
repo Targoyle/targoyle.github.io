@@ -10,7 +10,7 @@ from routers import default
 app = FastAPI(
     title="Vercel FastAPI",
     description="[targoyle.github.io](https://targoyle.github.io)",
-    version="0.0.1",
+    version="0.1.0",
     root_path="/",
     openapi_url="/openapi.json",
     docs_url="/docs",
