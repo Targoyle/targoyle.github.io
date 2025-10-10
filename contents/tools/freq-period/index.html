@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <title>周波数・周期変換計算機 - Sabotenic</title>
+    <meta name="description" content="周波数から周期、または周期から周波数を計算する。">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="normalize.css" rel="stylesheet" type="text/css">
+    <style>
+        body {
+            min-height: calc(100vh - 20px);
+            display: flex;
+            flex-direction: column;
+            font-family: Futura, Helvetica, Verdana, sans-serif;
+        }
+
+        main {
+            font-size: larger;
+            color: #202124;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-right: 3vw;
+        }
+
+        .main {
+            box-sizing: border-box;
+            width: 100vw;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: left;
+            padding: 20px;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 3vw;
+        }
+
+        .unit-col {
+            flex: 1;
+        }
+
+        .unit-title {
+            font-weight: bold;
+            margin-bottom: 0.7em;
+        }
+
+        .unit-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.2em;
+        }
+
+        .unit-row label {
+            min-width: 120px;
+        }
+
+        .unit-row input {
+            width: 120px;
+            padding: 4px;
+            font-size: 1.5em;
+        }
+
+        .unit-row .unit {
+            margin-left: 0.5em;
+        }
+
+        @media screen and (max-width: 600px) {
+            .flex-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .main {
+                padding: 8px;
+            }
+
+            .unit-row label {
+                min-width: 70px;
+            }
+
+            .unit-row input {
+                width: 90px;
+            }
+        }
+
+        footer {
+            text-align: center;
+        }
+
+        h1 {
+            margin-left: 7vw;
+            padding-top: 1.5rem;
+            padding-bottom: 1.0rem;
+        }
+
+        .logo {
+            color: #506b3a;
+            font-size: 3.5rem;
+            text-align: center;
+            font-weight: bold;
+            padding-top: 3.5rem;
+            padding-bottom: 2.0rem;
+            margin-top: auto;
+        }
+
+        .logo span.orange {
+            color: #f37043;
+        }
+
+        .logo a {
+            color: inherit;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <h1>周波数-周期計算機</h1>
+        <div class="main">
+            <div class="flex-row">
+                <div class="unit-col">
+                    <div class="unit-title">周波数</div>
+                    <div class="unit-row">
+                        <label for="hz">Hz</label>
+                        <input type="number" id="hz" min="0" step="any" autocomplete="off">
+                        <span class="unit">Hz</span>
+                    </div>
+                    <div class="unit-row">
+                        <label for="khz">kHz</label>
+                        <input type="number" id="khz" min="0" step="any" autocomplete="off">
+                        <span class="unit">kHz</span>
+                    </div>
+                    <div class="unit-row">
+                        <label for="mhz">MHz</label>
+                        <input type="number" id="mhz" min="0" step="any" autocomplete="off">
+                        <span class="unit">MHz</span>
+                    </div>
+                    <div class="unit-row">
+                        <label for="thz">THz</label>
+                        <input type="number" id="thz" min="0" step="any" autocomplete="off">
+                        <span class="unit">THz</span>
+                    </div>
+                </div>
+
+                <div class="unit-col">
+                    <div class="unit-title">周期</div>
+                    <div class="unit-row">
+                        <label for="sec">秒</label>
+                        <input type="number" id="sec" min="0" step="any" autocomplete="off">
+                        <span class="unit">s</span>
+                    </div>
+                    <div class="unit-row">
+                        <label for="ms">ミリ秒</label>
+                        <input type="number" id="ms" min="0" step="any" autocomplete="off">
+                        <span class="unit">ms</span>
+                    </div>
+                    <div class="unit-row">
+                        <label for="us">マイクロ秒</label>
+                        <input type="number" id="us" min="0" step="any" autocomplete="off">
+                        <span class="unit">&mu;s</span>
+                    </div>
+                    <div class="unit-row">
+                        <label for="ns">ナノ秒</label>
+                        <input type="number" id="ns" min="0" step="any" autocomplete="off">
+                        <span class="unit">ns</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="logo">
+            <a href="/">Saboten<span class="orange">i</span>sm</a>
+        </div>
+    </footer>
+
+    <script>
+        const units = {
+            hz: { type: "freq", factor: 1 },
+            khz: { type: "freq", factor: 1e3 },
+            mhz: { type: "freq", factor: 1e6 },
+            thz: { type: "freq", factor: 1e12 },
+            sec: { type: "period", factor: 1 },
+            ms: { type: "period", factor: 1e-3 },
+            us: { type: "period", factor: 1e-6 },
+            ns: { type: "period", factor: 1e-9 }
+        };
+        const ids = Object.keys(units);
+
+        function trimZeros(str) {
+            return str.replace(/(\.\d*?[1-9])0+$/, '$1')
+                .replace(/\.0+$/, '')
+                .replace(/(\.\d*?)0+$/, '$1')
+                .replace(/\.$/, '');
+        }
+
+        let isUpdating = false;
+
+        function updateFrom(id) {
+            if (isUpdating) return;
+            isUpdating = true;
+            const elem = document.getElementById(id);
+            const val = parseFloat(elem.value);
+            if (!(val > 0)) {
+                ids.forEach(k => { if (k !== id) document.getElementById(k).value = ""; });
+                isUpdating = false;
+                return;
+            }
+            let freqHz, periodSec;
+            if (units[id].type === "freq") {
+                freqHz = val * units[id].factor;
+                periodSec = 1 / freqHz;
+            } else {
+                periodSec = val * units[id].factor;
+                freqHz = 1 / periodSec;
+            }
+
+            ids.forEach(k => {
+                if (k === id) return;
+                let v;
+                if (units[k].type === "freq") {
+                    v = freqHz / units[k].factor;
+                } else {
+                    v = periodSec / units[k].factor;
+                }
+                document.getElementById(k).value = trimZeros(v.toPrecision(7));
+            });
+            isUpdating = false;
+        }
+
+        ids.forEach(id => {
+            document.getElementById(id).addEventListener("input", () => updateFrom(id));
+        });  
+    </script>
+</body>
+
+</html>
