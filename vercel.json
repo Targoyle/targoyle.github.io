@@ -12,5 +12,6 @@
             "destination": "/app/main.py"
         }
     ],
-    "trailingSlash": false
+    "trailingSlash": false,
+    "regions": ["hnd1"]
 }
