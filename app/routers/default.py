@@ -47,6 +47,11 @@ def favicon():
     )
 
 
+@router.get("/robots.txt", include_in_schema=False)
+def robots_txt():
+    return PlainTextResponse("User-agent: *\nDisallow:")
+
+
 @router.get(
     "/echo",
     summary="Echo Client Headers",
