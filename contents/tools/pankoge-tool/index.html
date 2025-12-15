@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タイミングよく踊らせるやつ</title>
+    <link href="normalize.css" rel="stylesheet" type="text/css">
+    <style>
+        :root {
+            color-scheme: light;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f5f7fb;
+            color: #1f2933;
+        }
+
+        main {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 32px 24px 64px;
+            display: grid;
+            gap: 32px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.9rem;
+            text-align: center;
+            color: #0f172a;
+        }
+
+        .controls,
+        .preview {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+        }
+
+        .controls form {
+            display: grid;
+            gap: 24px;
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        input[type="number"],
+        input[type="file"] {
+            font: inherit;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #cbd5f5;
+            background: #f8fafc;
+            color: inherit;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            background: #fff;
+        }
+
+        input[type="number"]:focus,
+        input[type="file"]:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        .hint {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .field-grid {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+
+        .stat {
+            background: #eef2ff;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: grid;
+            gap: 4px;
+        }
+
+        .stat-title {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .ratio-label {
+            margin: 0;
+            font-size: 1rem;
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .actions button {
+            border: none;
+            border-radius: 999px;
+            padding: 10px 22px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+        }
+
+        .actions button.primary {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: #ffffff;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+        }
+
+        .actions button.secondary {
+            background: linear-gradient(135deg, #475569, #64748b);
+            color: #f8fafc;
+        }
+
+        .actions button.ghost {
+            background: #e2e8f0;
+            color: #1f2937;
+        }
+
+        .actions button:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .actions button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            box-shadow: none;
+        }
+
+        .error {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #b91c1c;
+            min-height: 1.2em;
+        }
+
+        .preview h2 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: 1.2rem;
+            color: #0f172a;
+        }
+
+        .stage {
+            position: relative;
+            min-height: 320px;
+            border-radius: 18px;
+            border: 1px solid #cbd5f5;
+            background: radial-gradient(circle at top right, #eff6ff, #ffffff 55%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .stage.playing {
+            border-color: #2563eb;
+            box-shadow: 0 24px 60px rgba(37, 99, 235, 0.25);
+        }
+
+        .stage img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .placeholder {
+            color: #64748b;
+            font-size: 1rem;
+            text-align: center;
+            max-width: 80%;
+            line-height: 1.6;
+        }
+
+        .thumbnails {
+            margin-top: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .thumbnails button {
+            padding: 0;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background: transparent;
+            cursor: pointer;
+            width: 90px;
+            height: 90px;
+            overflow: hidden;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .thumbnails button:hover {
+            transform: translateY(-2px);
+        }
+
+        .thumbnails button.active {
+            border-color: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .thumbnails img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        @media (max-width: 720px) {
+            main {
+                padding: 24px 16px 48px;
+                gap: 24px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .controls,
+            .preview {
+                padding: 20px;
+            }
+
+            .stage {
+                min-height: 240px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <h1>絵をタイミングよく踊らせるやつ</h1>
+        <section class="controls">
+            <form id="controlForm">
+                <div class="field">
+                    <label for="imageFiles">フレーム画像</label>
+                    <input type="file" id="imageFiles" accept="image/*" multiple>
+                    <p class="hint">フレームにしたい画像を複数選択してください。読み込んだ順番で再生します。</p>
+                </div>
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="bpm">テンポ (BPM)</label>
+                        <input type="number" id="bpm" min="1" step="1" value="135">
+                    </div>
+                    <div class="field">
+                        <label for="beats">1ループの拍数</label>
+                        <input type="number" id="beats" min="0.25" step="0.25" value="2">
+                    </div>
+                    <div class="stat">
+                        <p class="stat-title">フレーム数</p>
+                        <p class="stat-value"><span id="frameCount">0</span> 枚</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat-title">ループ時間</p>
+                        <p class="stat-value"><span id="cycleDuration">-</span> 秒</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat-title">1枚あたり</p>
+                        <p class="stat-value"><span id="frameDuration">-</span> 秒</p>
+                    </div>
+                </div>
+                <p class="ratio-label" id="ratioInfo">0枚で4拍</p>
+                <div class="actions">
+                    <button type="button" id="startBtn" class="primary">再生</button>
+                    <button type="button" id="stopBtn" class="secondary" disabled>停止</button>
+                    <button type="button" id="clearBtn" class="ghost">リセット</button>
+                </div>
+                <p class="error" id="errorMessage" role="alert"></p>
+            </form>
+        </section>
+        <section class="preview">
+            <!-- <h2>プレビュー</h2> -->
+            <div class="stage" id="stage" data-playing="false" aria-live="polite">
+                <p class="placeholder">画像を選択するとここでプレビューできます。</p>
+            </div>
+            <div class="thumbnails" id="thumbnails" aria-live="polite"></div>
+        </section>
+    </main>
+
+    <script>
+        (() => {
+            const form = document.getElementById("controlForm");
+            const imageInput = document.getElementById("imageFiles");
+            const bpmInput = document.getElementById("bpm");
+            const beatsInput = document.getElementById("beats");
+            const startBtn = document.getElementById("startBtn");
+            const stopBtn = document.getElementById("stopBtn");
+            const clearBtn = document.getElementById("clearBtn");
+            const stage = document.getElementById("stage");
+            const thumbnails = document.getElementById("thumbnails");
+            const frameCountEl = document.getElementById("frameCount");
+            const cycleDurationEl = document.getElementById("cycleDuration");
+            const frameDurationEl = document.getElementById("frameDuration");
+            const ratioInfoEl = document.getElementById("ratioInfo");
+            const errorMessageEl = document.getElementById("errorMessage");
+
+            const sampleFrameSources = [
+                "https://cdn.targoyle.jp/img/amecoro/pankoge_01.webp",
+                "https://cdn.targoyle.jp/img/amecoro/pankoge_02.webp",
+                "https://cdn.targoyle.jp/img/amecoro/pankoge_03.webp",
+                "https://cdn.targoyle.jp/img/amecoro/pankoge_04.webp",
+                "https://cdn.targoyle.jp/img/amecoro/pankoge_05.webp",
+                "https://cdn.targoyle.jp/img/amecoro/pankoge_06.webp"
+            ];
+
+            let frames = [];
+            let rafId = null;
+            let currentIndex = 0;
+            let animationStartMs = 0;
+            let cycleMs = 0;
+            let frameDurationMs = 0;
+
+            form.addEventListener("submit", (event) => {
+                event.preventDefault();
+            });
+
+            function formatNumber(value) {
+                if (!Number.isFinite(value)) {
+                    return "-";
+                }
+                const digits = value >= 10 ? 1 : 2;
+                return Number.parseFloat(value.toFixed(digits)).toString();
+            }
+
+            function renderPlaceholder() {
+                stage.innerHTML = "";
+                const message = document.createElement("p");
+                message.className = "placeholder";
+                message.textContent = "画像を選択するとここでプレビューできます。";
+                stage.appendChild(message);
+            }
+
+            function showFrame(index) {
+                if (!frames.length) {
+                    renderPlaceholder();
+                    return;
+                }
+                const safeIndex = index % frames.length;
+                currentIndex = safeIndex < 0 ? frames.length - 1 : safeIndex;
+                stage.innerHTML = "";
+                const image = document.createElement("img");
+                image.src = frames[currentIndex];
+                image.alt = `フレーム ${currentIndex + 1}`;
+                stage.appendChild(image);
+            }
+
+            function highlightActiveThumbnail() {
+                const buttons = thumbnails.querySelectorAll("button");
+                buttons.forEach((button, index) => {
+                    button.classList.toggle("active", frames.length > 0 && index === currentIndex);
+                });
+            }
+
+            function setPlayingState(active) {
+                stage.classList.toggle("playing", active);
+                stage.setAttribute("data-playing", active ? "true" : "false");
+                startBtn.disabled = active;
+                stopBtn.disabled = !active;
+            }
+
+            function setError(message) {
+                errorMessageEl.textContent = message || "";
+            }
+
+            function updateRatioText() {
+                const beats = Number.parseFloat(beatsInput.value);
+                const beatText = Number.isFinite(beats) ? formatNumber(beats) : beatsInput.value || "0";
+                ratioInfoEl.textContent = `${frames.length}枚で${beatText}拍`;
+            }
+
+            function updateStats() {
+                const bpm = Number.parseFloat(bpmInput.value);
+                const beats = Number.parseFloat(beatsInput.value);
+                frameCountEl.textContent = frames.length;
+
+                if (frames.length > 0 && Number.isFinite(bpm) && bpm > 0 && Number.isFinite(beats) && beats > 0) {
+                    const cycleSeconds = (60 * beats) / bpm;
+                    const frameSeconds = cycleSeconds / frames.length;
+                    cycleDurationEl.textContent = formatNumber(cycleSeconds);
+                    frameDurationEl.textContent = formatNumber(frameSeconds);
+                } else {
+                    cycleDurationEl.textContent = "-";
+                    frameDurationEl.textContent = "-";
+                }
+
+                updateRatioText();
+            }
+
+            function refreshThumbnails() {
+                thumbnails.innerHTML = "";
+                frames.forEach((src, index) => {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    const image = document.createElement("img");
+                    image.src = src;
+                    image.alt = `フレーム ${index + 1}`;
+                    button.appendChild(image);
+                    button.addEventListener("click", () => {
+                        stopAnimation();
+                        currentIndex = index;
+                        showFrame(currentIndex);
+                        highlightActiveThumbnail();
+                    });
+                    thumbnails.appendChild(button);
+                });
+                highlightActiveThumbnail();
+            }
+
+            function stopAnimation(options = {}) {
+                const { resetIndex = false } = options;
+                if (rafId) {
+                    window.cancelAnimationFrame(rafId);
+                    rafId = null;
+                }
+                if (resetIndex) {
+                    currentIndex = 0;
+                }
+                setPlayingState(false);
+                if (frames.length) {
+                    showFrame(currentIndex);
+                    highlightActiveThumbnail();
+                } else {
+                    renderPlaceholder();
+                }
+            }
+
+            function setFrames(sources) {
+                stopAnimation({ resetIndex: true });
+                frames = sources.slice();
+                animationStartMs = 0;
+                cycleMs = 0;
+                frameDurationMs = 0;
+
+                if (!frames.length) {
+                    renderPlaceholder();
+                    refreshThumbnails();
+                    updateStats();
+                    setError("");
+                    return;
+                }
+
+                showFrame(currentIndex);
+                refreshThumbnails();
+                updateStats();
+                setError("");
+            }
+
+            function startAnimation(keepIndex = false) {
+                const bpm = Number.parseFloat(bpmInput.value);
+                const beats = Number.parseFloat(beatsInput.value);
+
+                if (!frames.length) {
+                    setError("先にフレーム画像を読み込んでください。");
+                    return;
+                }
+                if (!Number.isFinite(bpm) || bpm <= 0) {
+                    setError("BPM は 1 以上の数値を指定してください。");
+                    return;
+                }
+                if (!Number.isFinite(beats) || beats <= 0) {
+                    setError("拍数は正の数値で指定してください。");
+                    return;
+                }
+
+                const nextCycleMs = ((60 * beats) / bpm) * 1000;
+                const nextFrameDurationMs = nextCycleMs / frames.length;
+
+                if (
+                    !Number.isFinite(nextCycleMs) ||
+                    nextCycleMs <= 0 ||
+                    !Number.isFinite(nextFrameDurationMs) ||
+                    nextFrameDurationMs <= 0
+                ) {
+                    setError("設定の組み合わせを確認してください。");
+                    return;
+                }
+
+                cycleMs = nextCycleMs;
+                frameDurationMs = nextFrameDurationMs;
+
+                setError("");
+                updateStats();
+
+                if (!keepIndex) {
+                    currentIndex = 0;
+                }
+
+                if (rafId) {
+                    window.cancelAnimationFrame(rafId);
+                    rafId = null;
+                }
+
+                const offset = keepIndex ? currentIndex * frameDurationMs : 0;
+                animationStartMs = performance.now() - offset;
+
+                showFrame(currentIndex);
+                highlightActiveThumbnail();
+
+                const tick = (now) => {
+                    const elapsedMs = now - animationStartMs;
+                    if (cycleMs <= 0) {
+                        return;
+                    }
+                    const wrappedMs = ((elapsedMs % cycleMs) + cycleMs) % cycleMs;
+                    const nextIndex = Math.floor(wrappedMs / frameDurationMs) % frames.length;
+                    if (nextIndex !== currentIndex) {
+                        currentIndex = nextIndex;
+                        showFrame(currentIndex);
+                        highlightActiveThumbnail();
+                    }
+                    rafId = window.requestAnimationFrame(tick);
+                };
+
+                rafId = window.requestAnimationFrame(tick);
+                setPlayingState(true);
+            }
+
+            function loadImages(fileList) {
+                const files = Array.from(fileList).filter((file) => file.type.startsWith("image/"));
+                if (!files.length) {
+                    setError("画像ファイルを選択してください。");
+                    imageInput.value = "";
+                    return;
+                }
+
+                Promise.all(
+                    files.map(
+                        (file) =>
+                            new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(reader.result);
+                                reader.onerror = () => reject(new Error("画像の読み込みに失敗しました。"));
+                                reader.readAsDataURL(file);
+                            })
+                    )
+                )
+                    .then((results) => {
+                        setFrames(results);
+                    })
+                    .catch(() => {
+                        setError("画像の読み込みに失敗しました。");
+                    })
+                    .finally(() => {
+                        imageInput.value = "";
+                    });
+            }
+
+            function resetAll() {
+                form.reset();
+                imageInput.value = "";
+                setFrames(sampleFrameSources);
+            }
+
+            imageInput.addEventListener("change", (event) => {
+                if (event.target.files) {
+                    loadImages(event.target.files);
+                }
+            });
+
+            bpmInput.addEventListener("input", () => {
+                updateStats();
+                if (rafId) {
+                    startAnimation(true);
+                }
+            });
+
+            beatsInput.addEventListener("input", () => {
+                updateStats();
+                if (rafId) {
+                    startAnimation(true);
+                }
+            });
+
+            startBtn.addEventListener("click", () => {
+                startAnimation(false);
+            });
+
+            stopBtn.addEventListener("click", () => {
+                stopAnimation();
+            });
+
+            clearBtn.addEventListener("click", () => {
+                resetAll();
+            });
+
+            setFrames(sampleFrameSources);
+        })();
+    </script>
+</body>
+
+</html>
