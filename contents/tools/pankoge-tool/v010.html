@@ -11,12 +11,6 @@
             color-scheme: light;
         }
 
-        html {
-            width: 100%;
-            max-width: 100%;
-            overflow-x: hidden;
-        }
-
         * {
             box-sizing: border-box;
         }
@@ -26,16 +20,12 @@
             font-family: "Segoe UI", Arial, sans-serif;
             background: #f5f7fb;
             color: #1f2933;
-            overflow-x: hidden;
-            padding-left: env(safe-area-inset-left, 0);
-            padding-right: env(safe-area-inset-right, 0);
         }
 
         main {
-            max-width: min(960px, 100vw);
-            width: 100%;
+            max-width: 960px;
             margin: 0 auto;
-            padding: 32px calc(clamp(12px, 4vw, 24px) + env(safe-area-inset-right, 0)) 64px calc(clamp(12px, 4vw, 24px) + env(safe-area-inset-left, 0));
+            padding: 32px 24px 64px;
             display: grid;
             gap: 32px;
         }
@@ -45,7 +35,6 @@
             font-size: 1.9rem;
             text-align: center;
             color: #0f172a;
-            word-break: keep-all;
         }
 
         .controls,
@@ -54,8 +43,6 @@
             border-radius: 16px;
             padding: 24px;
             box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
-            width: 100%;
-            max-width: 100%;
         }
 
         .controls form {
@@ -66,7 +53,6 @@
         .field {
             display: grid;
             gap: 8px;
-            min-width: 0;
         }
 
         label {
@@ -75,8 +61,7 @@
         }
 
         input[type="number"],
-        input[type="file"],
-        select {
+        input[type="file"] {
             font: inherit;
             padding: 10px 12px;
             border-radius: 10px;
@@ -84,23 +69,15 @@
             background: #f8fafc;
             color: inherit;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            max-width: 100%;
         }
 
         input[type="file"] {
             padding: 10px;
             background: #fff;
-            width: 100%;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            display: block;
         }
 
         input[type="number"]:focus,
-        input[type="file"]:focus,
-        select:focus {
+        input[type="file"]:focus {
             outline: none;
             border-color: #2563eb;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
@@ -110,34 +87,20 @@
             margin: 0;
             font-size: 0.85rem;
             color: #64748b;
-            word-break: keep-all;
         }
 
         .field-grid {
             display: grid;
             gap: 16px;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            width: 100%;
-            max-width: 100%;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         }
 
-        .stats-row {
-            grid-column: 1 / -1;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: baseline;
+        .stat {
             background: #eef2ff;
             border-radius: 12px;
-            padding: 12px 14px;
-            width: 100%;
-            max-width: 100%;
-        }
-
-        .stat-inline {
-            display: flex;
-            align-items: baseline;
-            gap: 6px;
+            padding: 12px 16px;
+            display: grid;
+            gap: 4px;
         }
 
         .stat-title {
@@ -162,63 +125,10 @@
             font-weight: 500;
         }
 
-        .preset-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            min-width: 0;
-        }
-
-        .tempo-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-            width: 100%;
-            min-width: 0;
-            max-width: 100%;
-        }
-
-        .tempo-actions button {
-            border: none;
-            border-radius: 12px;
-            padding: 10px 14px;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            color: #0f172a;
-            background: linear-gradient(135deg, #c7d2fe, #a5b4fc);
-            box-shadow: 0 8px 18px rgba(99, 102, 241, 0.25);
-            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
-            flex: 0 0 auto;
-        }
-
-        .tempo-actions button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(99, 102, 241, 0.3);
-        }
-
-        .tempo-actions button:active:not(:disabled) {
-            transform: translateY(0);
-            box-shadow: 0 8px 18px rgba(99, 102, 241, 0.25);
-        }
-
-        .tempo-actions input[type="number"] {
-            flex: 1 1 140px;
-            min-width: 0;
-        }
-
         .actions {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
-            width: 100%;
-            max-width: 100%;
-        }
-
-        .preset-label {
-            font-weight: 600;
-            color: #1e293b;
         }
 
         .actions button {
@@ -247,10 +157,6 @@
             color: #1f2937;
         }
 
-        .actions>* {
-            min-width: 0;
-        }
-
         .actions button:hover:not(:disabled) {
             transform: translateY(-2px);
         }
@@ -277,8 +183,6 @@
 
         .stage {
             position: relative;
-            width: 100%;
-            max-width: 100%;
             min-height: 320px;
             border-radius: 18px;
             border: 1px solid #cbd5f5;
@@ -299,7 +203,6 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            display: block;
         }
 
         .placeholder {
@@ -315,7 +218,6 @@
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
-            max-width: 100%;
         }
 
         .thumbnails button {
@@ -379,7 +281,7 @@
 
         @media (max-width: 720px) {
             main {
-                padding: 20px calc(14px + env(safe-area-inset-right, 0)) 48px calc(14px + env(safe-area-inset-left, 0));
+                padding: 24px 16px 48px;
                 gap: 24px;
             }
 
@@ -393,23 +295,7 @@
             }
 
             .stage {
-                min-height: 0;
-                aspect-ratio: 1 / 1;
-            }
-
-            .stats-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .field-grid {
-                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            }
-        }
-
-        @media (max-width: 520px) {
-            .field-grid {
-                grid-template-columns: 1fr;
+                min-height: 240px;
             }
         }
     </style>
@@ -417,51 +303,41 @@
 
 <body>
     <main>
-        <h1>絵を<wbr>タイミングよく<wbr>踊らせるやつ</h1>
+        <h1>絵をタイミングよく踊らせるやつ</h1>
         <section class="controls">
             <form id="controlForm">
                 <div class="field">
                     <label for="imageFiles">フレーム画像</label>
                     <input type="file" id="imageFiles" accept="image/*" multiple>
-                    <p class="hint">フレームにしたい画像を複数選択してください。<wbr>読み込んだ順番で再生します。</p>
+                    <p class="hint">フレームにしたい画像を複数選択してください。読み込んだ順番で再生します。</p>
                 </div>
                 <div class="field-grid">
                     <div class="field">
                         <label for="bpm">テンポ (BPM)</label>
-                        <div class="tempo-actions">
-                            <input type="number" id="bpm" min="0.01" step="0.01" value="135" aria-label="テンポ (BPM)">
-                            <button type="button" id="halfTempoBtn" class="ghost" aria-label="テンポを半分にする">1/2</button>
-                            <button type="button" id="doubleTempoBtn" class="ghost" aria-label="テンポを2倍にする">×2</button>
-                        </div>
+                        <input type="number" id="bpm" min="1" step="1" value="135">
                     </div>
                     <div class="field">
                         <label for="beats">1ループの拍数</label>
                         <input type="number" id="beats" min="0.25" step="0.25" value="2">
                     </div>
-                    <div class="stats-row" role="status" aria-live="polite">
-                        <div class="stat-inline">
-                            <p class="stat-title">フレーム数</p>
-                            <p class="stat-value"><span id="frameCount">0</span> 枚</p>
-                        </div>
-                        <div class="stat-inline">
-                            <p class="stat-title">ループ時間</p>
-                            <p class="stat-value"><span id="cycleDuration">-</span> 秒</p>
-                        </div>
-                        <div class="stat-inline">
-                            <p class="stat-title">1枚あたり</p>
-                            <p class="stat-value"><span id="frameDuration">-</span> 秒</p>
-                        </div>
+                    <div class="stat">
+                        <p class="stat-title">フレーム数</p>
+                        <p class="stat-value"><span id="frameCount">0</span> 枚</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat-title">ループ時間</p>
+                        <p class="stat-value"><span id="cycleDuration">-</span> 秒</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat-title">1枚あたり</p>
+                        <p class="stat-value"><span id="frameDuration">-</span> 秒</p>
                     </div>
                 </div>
+                <p class="ratio-label" id="ratioInfo">0枚で4拍</p>
                 <div class="actions">
-                    <button type="button" id="toggleBtn" class="primary" aria-pressed="false">再生</button>
-                    <div class="preset-group" aria-label="プリセット">
-                        <span class="preset-label">プリセット:</span>
-                        <select id="presetSelect" aria-label="プリセットを選択">
-                            <option value="pankoge">パンこげ</option>
-                        </select>
-                        <button type="button" id="applyPresetBtn" class="ghost">適用</button>
-                    </div>
+                    <button type="button" id="startBtn" class="primary">再生</button>
+                    <button type="button" id="stopBtn" class="secondary" disabled>停止</button>
+                    <button type="button" id="clearBtn" class="ghost">リセット</button>
                 </div>
                 <p class="error" id="errorMessage" role="alert"></p>
             </form>
@@ -476,7 +352,7 @@
     </main>
 
     <footer>
-        <p class="powered-by">Powered by gpt-5.1-codex</p>
+        <p class="powered-by">Powered by gpt-5-codex</p>
         <div class="logo">
             <a href="/">Saboten<span class="orange">i</span>sm</a>
         </div>
@@ -488,50 +364,32 @@
             const imageInput = document.getElementById("imageFiles");
             const bpmInput = document.getElementById("bpm");
             const beatsInput = document.getElementById("beats");
-            const toggleBtn = document.getElementById("toggleBtn");
-            const presetSelect = document.getElementById("presetSelect");
-            const applyPresetBtn = document.getElementById("applyPresetBtn");
-            const halfTempoBtn = document.getElementById("halfTempoBtn");
-            const doubleTempoBtn = document.getElementById("doubleTempoBtn");
+            const startBtn = document.getElementById("startBtn");
+            const stopBtn = document.getElementById("stopBtn");
+            const clearBtn = document.getElementById("clearBtn");
             const stage = document.getElementById("stage");
             const thumbnails = document.getElementById("thumbnails");
             const frameCountEl = document.getElementById("frameCount");
             const cycleDurationEl = document.getElementById("cycleDuration");
             const frameDurationEl = document.getElementById("frameDuration");
-            const errorMessageEl = document.getElementById("errorMessage");
             const ratioInfoEl = document.getElementById("ratioInfo");
-            let placeholderEl = document.querySelector(".placeholder");
-            let stageImage = null;
+            const errorMessageEl = document.getElementById("errorMessage");
 
             const sampleFrameSources = [
                 "https://cdn.targoyle.jp/img/amecoro/pankoge_01.webp",
                 "https://cdn.targoyle.jp/img/amecoro/pankoge_02.webp",
                 "https://cdn.targoyle.jp/img/amecoro/pankoge_03.webp",
                 "https://cdn.targoyle.jp/img/amecoro/pankoge_04.webp",
-                "https://cdn.targoyle.jp/img/amecoro/pankoge_02.webp",
+                "https://cdn.targoyle.jp/img/amecoro/pankoge_05.webp",
                 "https://cdn.targoyle.jp/img/amecoro/pankoge_06.webp"
             ];
 
-            const presets = {
-                pankoge: {
-                    name: "パンこげ",
-                    bpm: 135,
-                    beats: 2,
-                    frames: sampleFrameSources
-                }
-            };
-
             let frames = [];
             let rafId = null;
-            let frameTimerId = null;
             let currentIndex = 0;
             let animationStartMs = 0;
             let cycleMs = 0;
             let frameDurationMs = 0;
-            let pausedElapsedMs = 0;
-            let lastRenderedIndex = null;
-            let preloadPromise = Promise.resolve();
-            let lastFrameChangeMs = 0;
 
             form.addEventListener("submit", (event) => {
                 event.preventDefault();
@@ -541,22 +399,16 @@
                 if (!Number.isFinite(value)) {
                     return "-";
                 }
-                const digits = 2;
+                const digits = value >= 10 ? 1 : 2;
                 return Number.parseFloat(value.toFixed(digits)).toString();
             }
 
             function renderPlaceholder() {
-                if (!placeholderEl) {
-                    placeholderEl = document.createElement("p");
-                    placeholderEl.className = "placeholder";
-                    placeholderEl.textContent = "画像を選択するとここでプレビューできます。";
-                    stage.appendChild(placeholderEl);
-                }
-                placeholderEl.style.display = "block";
-                if (stageImage) {
-                    stageImage.style.display = "none";
-                }
-                lastRenderedIndex = null;
+                stage.innerHTML = "";
+                const message = document.createElement("p");
+                message.className = "placeholder";
+                message.textContent = "画像を選択するとここでプレビューできます。";
+                stage.appendChild(message);
             }
 
             function showFrame(index) {
@@ -564,28 +416,13 @@
                     renderPlaceholder();
                     return;
                 }
-                if (!stageImage) {
-                    stageImage = document.createElement("img");
-                    stageImage.className = "frame-image";
-                    stageImage.loading = "eager";
-                    stageImage.decoding = "sync";
-                    stageImage.alt = "フレーム";
-                    stageImage.draggable = false;
-                    stage.appendChild(stageImage);
-                }
                 const safeIndex = index % frames.length;
                 currentIndex = safeIndex < 0 ? frames.length - 1 : safeIndex;
-                if (lastRenderedIndex === currentIndex && stageImage && stageImage.style.display !== "none") {
-                    return;
-                }
-                const nextSrc = frames[currentIndex];
-                stageImage.style.display = "block";
-                stageImage.src = nextSrc;
-                stageImage.alt = `フレーム ${currentIndex + 1}`;
-                if (placeholderEl) {
-                    placeholderEl.style.display = "none";
-                }
-                lastRenderedIndex = currentIndex;
+                stage.innerHTML = "";
+                const image = document.createElement("img");
+                image.src = frames[currentIndex];
+                image.alt = `フレーム ${currentIndex + 1}`;
+                stage.appendChild(image);
             }
 
             function highlightActiveThumbnail() {
@@ -595,17 +432,11 @@
                 });
             }
 
-            function isPlaying() {
-                return stage.getAttribute("data-playing") === "true";
-            }
-
             function setPlayingState(active) {
                 stage.classList.toggle("playing", active);
                 stage.setAttribute("data-playing", active ? "true" : "false");
-                toggleBtn.textContent = active ? "停止" : "再生";
-                toggleBtn.setAttribute("aria-pressed", active ? "true" : "false");
-                toggleBtn.classList.toggle("primary", !active);
-                toggleBtn.classList.toggle("secondary", active);
+                startBtn.disabled = active;
+                stopBtn.disabled = !active;
             }
 
             function setError(message) {
@@ -613,9 +444,6 @@
             }
 
             function updateRatioText() {
-                if (!ratioInfoEl) {
-                    return;
-                }
                 const beats = Number.parseFloat(beatsInput.value);
                 const beatText = Number.isFinite(beats) ? formatNumber(beats) : beatsInput.value || "0";
                 ratioInfoEl.textContent = `${frames.length}枚で${beatText}拍`;
@@ -659,35 +487,11 @@
                 highlightActiveThumbnail();
             }
 
-            function preloadFrames(sources) {
-                return Promise.all(
-                    sources.map(
-                        (src) =>
-                            new Promise((resolve) => {
-                                const img = new Image();
-                                img.onload = () => resolve();
-                                img.onerror = () => resolve();
-                                img.src = src;
-                            })
-                    )
-                );
-            }
-
             function stopAnimation(options = {}) {
                 const { resetIndex = false } = options;
                 if (rafId) {
                     window.cancelAnimationFrame(rafId);
                     rafId = null;
-                }
-                if (frameTimerId) {
-                    window.clearTimeout(frameTimerId);
-                    frameTimerId = null;
-                }
-                if (!resetIndex && frames.length && cycleMs > 0) {
-                    const now = performance.now();
-                    pausedElapsedMs = ((now - animationStartMs) % cycleMs + cycleMs) % cycleMs;
-                } else {
-                    pausedElapsedMs = 0;
                 }
                 if (resetIndex) {
                     currentIndex = 0;
@@ -707,10 +511,6 @@
                 animationStartMs = 0;
                 cycleMs = 0;
                 frameDurationMs = 0;
-                pausedElapsedMs = 0;
-                lastRenderedIndex = null;
-                preloadPromise = preloadFrames(frames);
-                lastFrameChangeMs = 0;
 
                 if (!frames.length) {
                     renderPlaceholder();
@@ -764,54 +564,36 @@
 
                 if (!keepIndex) {
                     currentIndex = 0;
-                    pausedElapsedMs = 0;
                 }
 
                 if (rafId) {
                     window.cancelAnimationFrame(rafId);
                     rafId = null;
                 }
-                if (frameTimerId) {
-                    window.clearTimeout(frameTimerId);
-                    frameTimerId = null;
-                }
 
-                const offset = keepIndex ? pausedElapsedMs || currentIndex * frameDurationMs : 0;
-                const startAfterPreload = () => {
-                    const wrappedOffset = ((offset % cycleMs) + cycleMs) % cycleMs;
-                    const normalizedIndex = Math.floor(wrappedOffset / frameDurationMs) % frames.length;
-                    animationStartMs = performance.now() - wrappedOffset;
-                    pausedElapsedMs = 0;
-                    currentIndex = normalizedIndex;
-                    lastFrameChangeMs = animationStartMs + normalizedIndex * frameDurationMs;
+                const offset = keepIndex ? currentIndex * frameDurationMs : 0;
+                animationStartMs = performance.now() - offset;
 
-                    showFrame(currentIndex);
-                    highlightActiveThumbnail();
+                showFrame(currentIndex);
+                highlightActiveThumbnail();
 
-                    const scheduleFrame = () => {
-                        if (cycleMs <= 0) {
-                            return;
-                        }
-                        const now = performance.now();
-                        const elapsedMs = now - animationStartMs;
-                        const cycleElapsed = ((elapsedMs % cycleMs) + cycleMs) % cycleMs;
-                        const targetIndex = Math.floor(cycleElapsed / frameDurationMs) % frames.length;
-                        if (targetIndex !== currentIndex) {
-                            currentIndex = targetIndex;
-                            lastFrameChangeMs = animationStartMs + Math.floor(elapsedMs / frameDurationMs) * frameDurationMs;
-                            showFrame(currentIndex);
-                            highlightActiveThumbnail();
-                        }
-                        const nextBoundary = animationStartMs + (Math.floor(elapsedMs / frameDurationMs) + 1) * frameDurationMs;
-                        const delay = Math.max(0, nextBoundary - performance.now() - 1);
-                        frameTimerId = window.setTimeout(scheduleFrame, delay);
-                    };
-
-                    scheduleFrame();
-                    setPlayingState(true);
+                const tick = (now) => {
+                    const elapsedMs = now - animationStartMs;
+                    if (cycleMs <= 0) {
+                        return;
+                    }
+                    const wrappedMs = ((elapsedMs % cycleMs) + cycleMs) % cycleMs;
+                    const nextIndex = Math.floor(wrappedMs / frameDurationMs) % frames.length;
+                    if (nextIndex !== currentIndex) {
+                        currentIndex = nextIndex;
+                        showFrame(currentIndex);
+                        highlightActiveThumbnail();
+                    }
+                    rafId = window.requestAnimationFrame(tick);
                 };
 
-                (preloadPromise || Promise.resolve()).then(startAfterPreload);
+                rafId = window.requestAnimationFrame(tick);
+                setPlayingState(true);
             }
 
             function loadImages(fileList) {
@@ -844,27 +626,10 @@
                     });
             }
 
-            function applyPreset(presetId) {
-                const preset = presets[presetId];
-                if (!preset) {
-                    return;
-                }
-                stopAnimation({ resetIndex: true });
-                bpmInput.value = preset.bpm;
-                beatsInput.value = preset.beats;
-                setFrames(preset.frames);
-                updateStats();
-                setError("");
-            }
-
-            function hydratePresetSelect() {
-                presetSelect.innerHTML = "";
-                Object.entries(presets).forEach(([key, preset]) => {
-                    const option = document.createElement("option");
-                    option.value = key;
-                    option.textContent = preset.name;
-                    presetSelect.appendChild(option);
-                });
+            function resetAll() {
+                form.reset();
+                imageInput.value = "";
+                setFrames(sampleFrameSources);
             }
 
             imageInput.addEventListener("change", (event) => {
@@ -875,51 +640,31 @@
 
             bpmInput.addEventListener("input", () => {
                 updateStats();
-                if (isPlaying()) {
+                if (rafId) {
                     startAnimation(true);
                 }
             });
 
             beatsInput.addEventListener("input", () => {
                 updateStats();
-                if (isPlaying()) {
+                if (rafId) {
                     startAnimation(true);
                 }
             });
 
-            function adjustTempo(multiplier) {
-                const current = Number.parseFloat(bpmInput.value);
-                const next = Number.isFinite(current) ? Math.max(0.01, current * multiplier) : 135;
-                bpmInput.value = formatNumber(next);
-                updateStats();
-                if (isPlaying()) {
-                    startAnimation(true);
-                }
-            }
-
-            halfTempoBtn.addEventListener("click", () => {
-                adjustTempo(0.5);
+            startBtn.addEventListener("click", () => {
+                startAnimation(false);
             });
 
-            doubleTempoBtn.addEventListener("click", () => {
-                adjustTempo(2);
+            stopBtn.addEventListener("click", () => {
+                stopAnimation();
             });
 
-            toggleBtn.addEventListener("click", () => {
-                if (isPlaying()) {
-                    stopAnimation();
-                } else {
-                    const shouldResume = pausedElapsedMs > 0 || currentIndex !== 0;
-                    startAnimation(shouldResume);
-                }
+            clearBtn.addEventListener("click", () => {
+                resetAll();
             });
 
-            applyPresetBtn.addEventListener("click", () => {
-                applyPreset(presetSelect.value);
-            });
-
-            hydratePresetSelect();
-            applyPreset("pankoge");
+            setFrames(sampleFrameSources);
         })();
     </script>
 </body>
