@@ -233,6 +233,28 @@
             min-width: 0;
         }
 
+        .preset-apply {
+            border: none;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #ffffff;
+            box-shadow: 0 10px 24px rgba(16, 185, 129, 0.25);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+        }
+
+        .preset-apply:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(16, 185, 129, 0.3);
+        }
+
+        .preset-apply:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 0 10px 24px rgba(16, 185, 129, 0.25);
+        }
+
         .tempo-actions {
             display: flex;
             gap: 8px;
@@ -488,52 +510,61 @@
                     <input type="file" id="imageFiles" accept="image/*" multiple>
                     <p class="hint">フレームにしたい画像を複数選択してください。<wbr>読み込んだ順番で再生します。</p>
                 </div>
-                <div class="field-grid">
-                    <div class="field">
-                        <label for="bpm">テンポ (BPM)</label>
-                        <div class="tempo-actions">
-                            <input type="number" id="bpm" min="0.01" step="0.01" value="135" aria-label="テンポ (BPM)">
-                            <button type="button" id="halfTempoBtn" class="ghost" aria-label="テンポを半分にする">1/2</button>
-                            <button type="button" id="doubleTempoBtn" class="ghost" aria-label="テンポを2倍にする">×2</button>
-                        </div>
-                        <div class="tap-assist" aria-live="polite">
-                            <div class="tap-buttons">
-                                <button type="button" id="tapTempoBtn" aria-label="音楽に合わせてタップして BPM を推定する"
-                                    class="secondary">タップで計測</button>
-                                <button type="button" id="resetTapBtn" class="ghost">リセット</button>
-                            </div>
-                            <p class="tap-result" id="tapResult">推定 BPM: -</p>
-                            <p class="hint">音楽に合わせて 4 回以上タップすると BPM を更新します。</p>
-                        </div>
+                <div class="field">
+                    <label for="presetSelect">プリセット</label>
+                    <div class="preset-group" aria-label="プリセット">
+                        <select id="presetSelect" aria-label="プリセットを選択">
+                            <option value="pankoge">パンこげ</option>
+                        </select>
+                        <button type="button" id="applyPresetBtn" class="preset-apply">適用</button>
                     </div>
+                </div>
+                <div class="field-grid">
                     <div class="field">
                         <label for="beats">1ループの拍数</label>
                         <input type="number" id="beats" min="0.25" step="0.25" value="2">
                     </div>
-                    <div class="stats-row" role="status" aria-live="polite">
-                        <div class="stat-inline">
-                            <p class="stat-title">フレーム数</p>
-                            <p class="stat-value"><span id="frameCount">0</span> 枚</p>
+                    <div class="field">
+                        <p class="ratio-label">計算結果</p>
+                        <div class="stats-row" role="status" aria-live="polite">
+                            <div class="stat-inline">
+                                <p class="stat-title">フレーム数</p>
+                                <p class="stat-value"><span id="frameCount">0</span> 枚</p>
+                            </div>
+                            <div class="stat-inline">
+                                <p class="stat-title">ループ時間</p>
+                                <p class="stat-value"><span id="cycleDuration">-</span> 秒</p>
+                            </div>
+                            <div class="stat-inline">
+                                <p class="stat-title">1枚あたり</p>
+                                <p class="stat-value"><span id="frameDuration">-</span> 秒</p>
+                            </div>
                         </div>
-                        <div class="stat-inline">
-                            <p class="stat-title">ループ時間</p>
-                            <p class="stat-value"><span id="cycleDuration">-</span> 秒</p>
+                        <p class="ratio-label" id="ratioInfo"></p>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="tapTempoBtn">テンポ計測</label>
+                    <div class="tap-assist" aria-live="polite">
+                        <div class="tap-buttons">
+                            <button type="button" id="tapTempoBtn" aria-label="音楽に合わせてタップして BPM を推定する"
+                                class="secondary">タップで計測</button>
+                            <button type="button" id="resetTapBtn" class="ghost">リセット</button>
                         </div>
-                        <div class="stat-inline">
-                            <p class="stat-title">1枚あたり</p>
-                            <p class="stat-value"><span id="frameDuration">-</span> 秒</p>
-                        </div>
+                        <p class="tap-result" id="tapResult">推定 BPM: -</p>
+                        <p class="hint">音楽に合わせて 4 回以上タップすると BPM を更新します。</p>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="bpm">テンポ入力 (BPM)</label>
+                    <div class="tempo-actions">
+                        <input type="number" id="bpm" min="0.01" step="0.01" value="135" aria-label="テンポ (BPM)">
+                        <button type="button" id="halfTempoBtn" class="ghost" aria-label="テンポを半分にする">1/2</button>
+                        <button type="button" id="doubleTempoBtn" class="ghost" aria-label="テンポを2倍にする">×2</button>
                     </div>
                 </div>
                 <div class="actions">
                     <button type="button" id="toggleBtn" class="primary" aria-pressed="false">再生</button>
-                    <div class="preset-group" aria-label="プリセット">
-                        <span class="preset-label">プリセット:</span>
-                        <select id="presetSelect" aria-label="プリセットを選択">
-                            <option value="pankoge">パンこげ</option>
-                        </select>
-                        <button type="button" id="applyPresetBtn" class="ghost">適用</button>
-                    </div>
                 </div>
                 <p class="error" id="errorMessage" role="alert"></p>
             </form>
