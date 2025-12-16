@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>タイミングよく踊らせるやつ</title>
     <link href="normalize.css" rel="stylesheet" type="text/css">
     <style>
@@ -19,12 +19,6 @@
 
         * {
             box-sizing: border-box;
-        }
-
-        button,
-        input,
-        select {
-            touch-action: manipulation;
         }
 
         body {
@@ -102,63 +96,6 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             display: block;
-        }
-
-        .tap-assist {
-            display: grid;
-            gap: 6px;
-            margin-top: 12px;
-            padding: 12px;
-            border: 1px dashed #cbd5f5;
-            border-radius: 12px;
-            background: #f8fafc;
-        }
-
-        .tap-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .tap-buttons button {
-            border: none;
-            border-radius: 12px;
-            padding: 10px 14px;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            color: #0f172a;
-            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
-            box-shadow: 0 8px 18px rgba(99, 102, 241, 0.18);
-            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
-            flex: 0 0 auto;
-        }
-
-        .tap-buttons button.secondary {
-            background: linear-gradient(135deg, #475569, #64748b);
-            color: #f8fafc;
-        }
-
-        .tap-buttons button.ghost {
-            background: #e2e8f0;
-            color: #1f2937;
-            box-shadow: none;
-        }
-
-        .tap-buttons button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(99, 102, 241, 0.24);
-        }
-
-        .tap-buttons button:active:not(:disabled) {
-            transform: translateY(0);
-            box-shadow: 0 8px 18px rgba(99, 102, 241, 0.18);
-        }
-
-        .tap-result {
-            margin: 0;
-            font-size: 0.95rem;
-            color: #0f172a;
-            font-weight: 600;
         }
 
         input[type="number"]:focus,
@@ -496,15 +433,6 @@
                             <button type="button" id="halfTempoBtn" class="ghost" aria-label="テンポを半分にする">1/2</button>
                             <button type="button" id="doubleTempoBtn" class="ghost" aria-label="テンポを2倍にする">×2</button>
                         </div>
-                        <div class="tap-assist" aria-live="polite">
-                            <div class="tap-buttons">
-                                <button type="button" id="tapTempoBtn" aria-label="音楽に合わせてタップして BPM を推定する"
-                                    class="secondary">タップで計測</button>
-                                <button type="button" id="resetTapBtn" class="ghost">リセット</button>
-                            </div>
-                            <p class="tap-result" id="tapResult">推定 BPM: -</p>
-                            <p class="hint">音楽に合わせて 4 回以上タップすると BPM を更新します。</p>
-                        </div>
                     </div>
                     <div class="field">
                         <label for="beats">1ループの拍数</label>
@@ -565,9 +493,6 @@
             const applyPresetBtn = document.getElementById("applyPresetBtn");
             const halfTempoBtn = document.getElementById("halfTempoBtn");
             const doubleTempoBtn = document.getElementById("doubleTempoBtn");
-            const tapTempoBtn = document.getElementById("tapTempoBtn");
-            const resetTapBtn = document.getElementById("resetTapBtn");
-            const tapResultEl = document.getElementById("tapResult");
             const stage = document.getElementById("stage");
             const thumbnails = document.getElementById("thumbnails");
             const frameCountEl = document.getElementById("frameCount");
@@ -607,9 +532,6 @@
             let lastRenderedIndex = null;
             let preloadPromise = Promise.resolve();
             let lastFrameChangeMs = 0;
-            let tapTimestamps = [];
-            const TAP_TIMEOUT_MS = 2500;
-            const MIN_TAPS_FOR_ESTIMATE = 4;
 
             form.addEventListener("submit", (event) => {
                 event.preventDefault();
@@ -892,64 +814,6 @@
                 (preloadPromise || Promise.resolve()).then(startAfterPreload);
             }
 
-            function resetTapTempo() {
-                tapTimestamps = [];
-                if (tapResultEl) {
-                    tapResultEl.textContent = "推定 BPM: -";
-                }
-            }
-
-            function applyEstimatedBpm(bpm) {
-                if (!Number.isFinite(bpm) || bpm <= 0) {
-                    return;
-                }
-                const formatted = formatNumber(bpm);
-                bpmInput.value = formatted;
-                if (tapResultEl) {
-                    tapResultEl.textContent = `推定 BPM: ${formatted}`;
-                }
-                updateStats();
-                if (isPlaying()) {
-                    startAnimation(true);
-                }
-            }
-
-            function handleTap() {
-                const now = performance.now();
-                const lastTap = tapTimestamps[tapTimestamps.length - 1];
-
-                if (lastTap && now - lastTap > TAP_TIMEOUT_MS) {
-                    tapTimestamps = [];
-                }
-
-                tapTimestamps.push(now);
-
-                if (tapTimestamps.length > 8) {
-                    tapTimestamps = tapTimestamps.slice(-8);
-                }
-
-                if (tapTimestamps.length < MIN_TAPS_FOR_ESTIMATE) {
-                    if (tapResultEl) {
-                        tapResultEl.textContent = "推定 BPM: 計測中...";
-                    }
-                    return;
-                }
-
-                const intervals = [];
-                for (let i = 1; i < tapTimestamps.length; i += 1) {
-                    intervals.push(tapTimestamps[i] - tapTimestamps[i - 1]);
-                }
-
-                const validIntervals = intervals.filter((value) => value > 0);
-                if (!validIntervals.length) {
-                    return;
-                }
-
-                const averageInterval = validIntervals.reduce((sum, value) => sum + value, 0) / validIntervals.length;
-                const estimatedBpm = 60000 / averageInterval;
-                applyEstimatedBpm(estimatedBpm);
-            }
-
             function loadImages(fileList) {
                 const files = Array.from(fileList).filter((file) => file.type.startsWith("image/"));
                 if (!files.length) {
@@ -1048,14 +912,6 @@
                     const shouldResume = pausedElapsedMs > 0 || currentIndex !== 0;
                     startAnimation(shouldResume);
                 }
-            });
-
-            tapTempoBtn.addEventListener("click", () => {
-                handleTap();
-            });
-
-            resetTapBtn.addEventListener("click", () => {
-                resetTapTempo();
             });
 
             applyPresetBtn.addEventListener("click", () => {
